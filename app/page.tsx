@@ -1,9 +1,13 @@
-import Image from "next/image";
+import Bg from "@/components/BackgroundImages/bg";
 
 export default function Home() {
   return (
-   <div>
+   <main className="w-full h-full">
     
-   </div>
+
+     
+    {/* bg img */}
+        <Bg/>
+   </main>
   );
 }
