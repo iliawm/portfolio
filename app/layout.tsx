@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TaskBar from "@/components/TaskBar/TaskBar";
-
+import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
   title: "Windows 11 Portfolio",
@@ -18,10 +18,36 @@ export default function RootLayout({
     <html
       lang="en"
       className={` h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col ">
+        {/* lowersize devices error */}
+        <div className="w-full h-full fixed md:hidden flex flex-col items-center justify-center top-0 left-0 bg-black text-white px-20 gap-5" >
+          <div className="text-red-400">
+            this website was designed for larger screens
+            </div>
+            <div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" width="80" height="60">
+              <rect x="10" y="5" width="120" height="80" rx="6" fill="#2D3748" />
+              <rect x="16" y="11" width="108" height="68" rx="4" fill="#1A202C" />
+              <rect x="22" y="18" width="50" height="6" rx="3" fill="#4A5568" />
+              <rect x="22" y="30" width="40" height="6" rx="3" fill="#4A5568" />
+              <rect x="22" y="42" width="60" height="6" rx="3" fill="#4A5568" />
+              <path d="M5 85 L135 85 L120 95 L20 95 Z" fill="#4A5568" />
+              <line x1="100" y1="20" x2="130" y2="50" stroke="#48BB78" strokeWidth="1.5" strokeDasharray="3,3" />
+              <rect x="130" y="40" width="35" height="60" rx="8" fill="#2D3748" />
+              <rect x="135" y="46" width="25" height="48" rx="4" fill="#1A202C" />
+              <rect x="138" y="52" width="18" height="4" rx="2" fill="#4A5568" />
+              <rect x="138" y="62" width="14" height="4" rx="2" fill="#4A5568" />
+              <rect x="138" y="72" width="20" height="4" rx="2" fill="#4A5568" />
+            </svg>
+            </div>
+        </div>
+        {/* main code */}
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem >
         {children}
-        <TaskBar/>
+        <TaskBar />
+        </ThemeProvider>
         </body>
       
     </html>
