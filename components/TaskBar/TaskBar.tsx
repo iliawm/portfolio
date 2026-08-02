@@ -18,9 +18,10 @@ const TaskBar = () => {
 
     useEffect(() => {
         renderMenu()
+        setTheme("dark")
     }, [menuIndex])
     useEffect(()=>{
-        console.log(theme)
+        // 
 
     })
     const renderMenu = () => {
