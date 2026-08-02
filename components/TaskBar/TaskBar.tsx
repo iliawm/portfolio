@@ -19,7 +19,10 @@ const TaskBar = () => {
     useEffect(() => {
         renderMenu()
     }, [menuIndex])
+    useEffect(()=>{
+        console.log(theme)
 
+    })
     const renderMenu = () => {
         switch (menuIndex) {
             case 0:
