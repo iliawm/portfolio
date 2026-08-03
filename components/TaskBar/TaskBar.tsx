@@ -49,7 +49,7 @@ const TaskBar = () => {
 
     return (
         <section className={`w-full h-15 ${currentTheme === "dark" ? "bg-[#1A1A1A]" : "bg-[#FFFFFF]"} fixed bottom-0 flex z-40 justify-center items-center py-2 gap-2 invisible md:visible`}>
-            <div className={`absolute h-140 w-120 lg:w-170 lg:h-170 ${theme==="dark" ? "bg-[#1A1A1A]":"bg-white"} transition-all bottom-19 z-30 rounded-xl ${Menu ? "opacity-100 translate-y-0" : "translate-y-4 opacity-0 pointer-events-none"}`}>
+            <div className={`absolute h-140 w-120 lg:w-170 lg:h-170 ${theme==="dark" ? "bg-[#1A1A1A]/80 backdrop-blur-2xl":"bg-white"} transition-all bottom-19 z-30 rounded-xl ${Menu ? "opacity-100 translate-y-0" : "translate-y-4 opacity-0 pointer-events-none"}`}>
             {renderMenu()}
             </div>
 

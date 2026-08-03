@@ -26,7 +26,7 @@ const MainMenu = () => {
           <section className="w-full h-fit min-h-30 flex flex-col ">
           <div className="flex justify-between items-center px-5 py-3 ">
             <h1>Pinned</h1>
-            <button className="flex gap-1 items-center bg-[#343434] px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
+            <button className="flex gap-1 items-center bg-[#343434]/70 backdrop-blur-2xl px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
               <h3>All apps</h3>
               <div className="icon "><RiArrowRightWideLine/></div>
             </button>
@@ -39,7 +39,7 @@ const MainMenu = () => {
        <section className="w-full h-fit min-h-30 flex flex-col  ">
           <div className="flex justify-between items-center px-5 py-3 ">
             <h1>Recommended</h1>
-            <button className="flex gap-1 items-center bg-[#343434] px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
+            <button className="flex gap-1 items-center bg-[#343434]/70 backdrop-blur-2xl px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
               <h3>More</h3>
               <div className="icon"><RiArrowRightWideLine/></div>
             </button>
@@ -50,19 +50,19 @@ const MainMenu = () => {
           </div>
         </section>
         </div>
-        <div className="profile flex items-center justify-between  relative bottom-0 bg-[#1c1c1c] w-full h-20 px-3 mb-1">
+        <div className="profile flex items-center justify-between  relative bottom-0  w-full h-20 px-3 mb-1">
           <div className="User flex gap-2 items-center py-4">
               <div className="w-8 h-8 relative"><Image  src={'/pfp/me.jpg'} fill className="rounded-full" alt="Userpfp"/></div>
               <h3 className="font-bold">Iliawm</h3>
           </div>
           <div className="buttons flex justify-center">
             
-              <button className="shotdown hover:bg-gray-600 transition-all duration-100 ease-linear px-3 py-2 cursor-pointer rounded-lg hover:scale-[1.06] active:scale-[1]" onClick={()=>{
+              <button className={`shotdown transition-all ease-linear duration-400 hover:bg-gray-600 ${menu ?"bg-gray-600 animate-pulse":""} transition-all duration-100 ease-linear px-3 py-2 cursor-pointer rounded-lg hover:scale-[1.06] active:scale-[1]`} onClick={()=>{
                       setMenu(!menu) 
               }}>
                   <FaPowerOff />
               </button>
-              <div className={`absolute w-fit bg-[#1a1a1a] h-fit bottom-15 shadow shadow-gray-700/60 rounded-xl border border-gray-700/40 p-3 px-4 flex flex-col ${menu ? "opacity-100 " : "opacity-0 pointer-events-none"} text-sm border-gray-700/60`}>
+              <div className={`absolute w-fit bg-[#1a1a1a]/40 backdrop-blur-2xl h-fit bottom-15 shadow shadow-gray-700/60 rounded-xl border border-gray-700/40 p-3 px-4 flex flex-col ${menu ? "opacity-100 " : "opacity-0 pointer-events-none"} text-sm border-gray-700/60`}>
                 <button className="shotdown flex gap-2.5 items-center text-nowrap cursor-pointer hover:scale-[1.05] active:scale-[1] transition-all ease-linear hover:bg-white/10 rounded-md px-1 py-1" onClick={()=>{
                   setMode(2)
                   handleShutdown()
