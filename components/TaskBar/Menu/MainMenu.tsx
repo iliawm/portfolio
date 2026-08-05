@@ -75,7 +75,7 @@ const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode }: MainMenu
             <div className="profile flex items-center justify-between relative bottom-0 w-full h-20 px-3 mb-1">
                 <div className="User flex gap-2 items-center py-4">
                     <div className="w-8 h-8 relative">
-                        <Image src={'/pfp/me.jpg'} fill className="rounded-full" alt="Userpfp" />
+                        <Image src={'/pfp/me.jpg'} fill className="rounded-full" alt="Userpfp" sizes="auto"/>
                     </div>
                     <h3 className="font-bold">Iliawm</h3>
                 </div>
