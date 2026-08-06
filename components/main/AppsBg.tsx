@@ -5,7 +5,7 @@ import Apps from "./Apps/Apps";
 
 const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const gridSize = 90;
+  const gridSize = 80;
   const [gridPosition, setGridPosition] = useState({ col: 0, row: 0 });
 
   return (

@@ -1,8 +1,9 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from "framer-motion";
-
+import Image from 'next/image';
+import { IoSettings } from "react-icons/io5";
 interface AppsProps {
   gridSize: number;
   gridPosition: { col: number; row: number };
@@ -12,9 +13,10 @@ interface AppsProps {
 
 const Apps = ({ gridSize, gridPosition, setGridPosition, containerRef }: AppsProps) => {
   return (
+    <>
     <motion.div 
       
-      className="absolute bg-red-700 flex flex-col items-center justify-center py-2 active:scale-95 cursor-grab active:cursor-grabbing select-none"
+      className={`absolute active:bg-white/10 active:border border-gray-300 flex flex-col items-center justify-center py-2 active:scale-95 gap-1 cursor-pointer active:cursor-grabbing select-none`}
       
       
       style={{
@@ -53,11 +55,23 @@ const Apps = ({ gridSize, gridPosition, setGridPosition, containerRef }: AppsPro
           row: Math.max(0, row),
         });
       }}
+      onClick={()=>{
+
+      }}
     >
-      <span className="text-white text-xs font-mono">
-        {gridPosition.col},{gridPosition.row}
+      <span className="
+      text-black xs:text-xs font-mono relative 
+      text-3xl
+      ">
+            {/* <Image src={"/"} alt='App icon' fill sizes='fill'/> */}
+            <IoSettings />
+      </span>
+      <span className='font-bold text-black'>
+        settings
       </span>
     </motion.div>
+    
+    </>
   )
 }
 
