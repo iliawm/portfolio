@@ -3,7 +3,7 @@ import AppsBg from "@/components/main/AppsBg";
 
 export default function Home() {
   return (
-   <main className="w-full h-full ">
+   <main className="w-full h-full absolute ">
     <AppsBg/>
 
 
