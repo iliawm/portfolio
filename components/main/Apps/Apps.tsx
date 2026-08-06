@@ -8,7 +8,7 @@ interface AppsProps {
   gridSize: number;
   gridPosition: { col: number; row: number };
   setGridPosition: React.Dispatch<React.SetStateAction<{ col: number; row: number }>>;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const Apps = ({ gridSize, gridPosition, setGridPosition, containerRef }: AppsProps) => {
@@ -60,13 +60,11 @@ const Apps = ({ gridSize, gridPosition, setGridPosition, containerRef }: AppsPro
       }}
     >
       <span className="
-      text-black xs:text-xs font-mono relative 
-      text-3xl
-      ">
-            {/* <Image src={"/"} alt='App icon' fill sizes='fill'/> */}
-            <IoSettings />
+      text-black xs:text-xs font-mono relative text-3xl h-full w-full p-5">
+        <Image src={"/AppIcons/Settings.png"} alt='App icon' fill sizes='fill' className='px-4' loading='lazy'/>
+            
       </span>
-      <span className='font-bold text-black'>
+      <span className='font-bold text-white '>
         settings
       </span>
     </motion.div>
