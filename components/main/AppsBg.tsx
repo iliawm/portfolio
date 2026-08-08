@@ -23,6 +23,9 @@ const AppsBg = () => {
     <div 
       className="w-full h-screen absolute inset-0 z-20 overflow-hidden flex" 
       ref={containerRef}
+      onContextMenu={(e)=>{
+        e.preventDefault()
+      }}
       onClick={()=>{
         handle_Deselection()
       }}
