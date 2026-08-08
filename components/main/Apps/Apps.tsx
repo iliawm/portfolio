@@ -38,7 +38,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked }: App
     
      // handle open app
       console.log("open")
-
+        window.alert("apps window not implemented yet")
     }
    
       
