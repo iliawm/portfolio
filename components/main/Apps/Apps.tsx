@@ -55,7 +55,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked }: App
         return (
           <motion.div 
             key={app.id || index}
-            className={`absolute px-2  border-gray-300 flex flex-col items-center justify-center py-5 gap-1 cursor-pointer select-none m-2  active: active:cursor-grabbing active:scale-95 ${active? "bg-white/20 border":""}`}
+            className={`absolute px-2 hidden md:flex border-gray-300  flex-col items-center justify-center py-5 gap-1 cursor-pointer select-none m-2  active: active:cursor-grabbing active:scale-95 ${active? "bg-white/20 border":""}`}
             style={{
               width: `${gridSize}px`,
               height: `${gridSize}px`,
