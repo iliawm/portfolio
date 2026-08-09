@@ -5,6 +5,8 @@ export interface AppConfig {
   defaultCol: number;
   defaultRow: number;
   isIconpath:boolean;
+  isPinnedtoStart:boolean;
+  ispinnedtoTaskbar:boolean;
 }
 
 export const DESKTOP_APPS: AppConfig[] = [
@@ -15,6 +17,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     defaultCol: 0,
     defaultRow: 0,
     isIconpath:false,
+    isPinnedtoStart:false,
+    ispinnedtoTaskbar:false,
 
   },
   {
@@ -24,6 +28,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     defaultCol: 0,
     defaultRow: 1,
     isIconpath:false,
+    isPinnedtoStart:false,
+    ispinnedtoTaskbar:false,
 
   },
   {
@@ -33,6 +39,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     defaultCol: 0,
     defaultRow: 2,
     isIconpath:false,
+    isPinnedtoStart:false,
+    ispinnedtoTaskbar:false,
 
   },
   {
@@ -42,6 +50,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     defaultCol: 0,
     defaultRow: 3,
     isIconpath:true,
+    isPinnedtoStart:false,
+    ispinnedtoTaskbar:false,
 
   }
 ];
