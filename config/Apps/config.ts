@@ -27,8 +27,8 @@ export const DESKTOP_APPS: AppConfig[] = [
 
   },
   {
-    id: "terminal",
-    name: "Terminal",
+    id: "cmd",
+    name: "cmd",
     icon: "⌨️",
     defaultCol: 0,
     defaultRow: 2,
