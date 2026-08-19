@@ -67,12 +67,12 @@ const TaskBar = () => {
            {/* manage shutdown */}
            <div className={`fixed top-25 -right-101 w-fit bg-blue-500 h-fit flex px-4 py-5 justify-start rounded-lg items-center gap-5 font-bold transition-all ease-linear  ${Mode!==4?"-translate-x-101":""}`}>
                 <div className="text-green-400 text-xl"><FaCheck /></div>
-                <div className=" text-xl ">Your will visit Iliawms {name||"Github"} in {countdown}</div>
+                <div className=" text-xl ">You will visit Iliawms {name||"Github"} in {countdown}</div>
             </div>
             <div className={`absolute h-140 w-120 lg:w-170 lg:h-170 ${theme==="dark" ? "bg-[#1A1A1A]/80 backdrop-blur-2xl":"bg-white"} transition-all bottom-19 z-30 rounded-xl ${Menu ? "opacity-100 translate-y-0" : "translate-y-4 opacity-0 pointer-events-none"}`}>
             {renderMenu()}
             </div>
-
+            <>
             {/* WINDOWS */}
             <button className={`${menuIndex===0 && Menu ? (theme==="dark"? "bg-gray-600": "bg-gray-200"):""} cursor-pointer w-12 h-full relative ${theme==="dark"?"hover:bg-gray-600":"hover:bg-gray-200"} rounded-lg hover:scale-[1.1] active:scale-[1]`} onClick={() => {
                 if (menuIndex !== 0 && Menu) {
@@ -100,6 +100,11 @@ const TaskBar = () => {
                     <CiSearch />
                 </div>
             </button>
+            </>
+            <div className="w-fit h-full">
+                <
+            </div>
+
         </section>
     )
 }

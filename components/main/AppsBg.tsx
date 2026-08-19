@@ -6,7 +6,7 @@ import { DESKTOP_APPS } from '@/config/Apps/config';
 const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
-  const isAppDraggingRef = useRef(false); // Track if an app is being dragged
+  const isAppDraggingRef = useRef(false); 
   const gridSize = 80;
   const [appsState, setAppsState] = useState(DESKTOP_APPS);
   const [Clicked,setClicked]=useState(false)
@@ -35,7 +35,7 @@ const AppsBg = () => {
   }
 
   const handle_Deselection=()=>{
-    // Ignore deselection if selecting a box OR dragging an app
+   
     if (isDraggingRef.current || isAppDraggingRef.current) return;
     
     setClicked(true)
