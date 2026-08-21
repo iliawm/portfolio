@@ -6,6 +6,7 @@ import MainMenu from "./Menu/MainMenu"
 import SearchMenu from "./Menu/SearchMenu"
 import { useTheme } from "next-themes"
 import { FaCheck } from "react-icons/fa6";
+import Tray from "./Menu/Tray";
 const TaskBar = () => {
     const [Menu, SetMenu] = useState(false)
     const [menuIndex, SetMenuIndex] = useState(0)
@@ -14,7 +15,7 @@ const TaskBar = () => {
     const [countdown, setCountdown] = useState(0); 
     const [Mode, setMode] = useState(4);
     const [name,setName]=useState("")
-    
+    const [tray,setTray]=useState(false)
 
     useEffect(() => {
         setMounted(true)
@@ -101,8 +102,12 @@ const TaskBar = () => {
                 </div>
             </button>
             </>
-            <div className="w-fit h-full">
-                
+            <div className="w-fit h-full absolute right-0 mr-15 ">
+                <button className="h-full flex " onClick={()=>{
+                    setTray(!tray)
+                }}>
+                        <Tray tray={tray}/>
+                </button>
             </div>
 
         </section>
