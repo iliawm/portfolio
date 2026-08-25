@@ -12,9 +12,11 @@ interface MainMenuProps {
     setCountdown: React.Dispatch<React.SetStateAction<number>>;
     Mode: number;
     setMode: React.Dispatch<React.SetStateAction<number>>;
+    setSearch: React.Dispatch<React.SetStateAction<string>>;
+    search: string;
 }
 
-const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode }: MainMenuProps) => {
+const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode ,setSearch,search}: MainMenuProps) => {
     const [menu, setMenu] = useState(false);
 
     useEffect(() => {
@@ -45,7 +47,9 @@ const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode }: MainMenu
         <div className="w-full h-full p-7 pb-0 flex flex-col gap-5">
             <section className="search px-3 w-full h-12 flex gap-4 items-center ring ring-gray-700/80 rounded-sm border-b-2 border-purple-700">
                 <button className="flex scale-x-[-1] cursor-pointer"><IoIosSearch /></button>
-                <input type="text" className="w-full h-full focus:outline-0" placeholder="Type here to search" />
+                <input type="text" className="w-full h-full focus:outline-0" placeholder="Type here to search" value={search} onChange={(e)=>{
+                    setSearch(e.target.value)
+                }} autoFocus/>
             </section>
 
             <div className="w-full h-full flex flex-col justify-start gap-5 rounded-xl">

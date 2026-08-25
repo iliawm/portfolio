@@ -1,9 +1,14 @@
+import { useTheme } from "next-themes";
+import { useEffect } from "react";
 import { IoIosArrowUp } from "react-icons/io";
 
 const Tray = ({tray}:{tray:boolean}) => {
+  useEffect(()=>{
+    // console.log(theme)
+  })
   return (
     <div className="flex justify-center  h-full">
-      <div className={`absolute w-24 h-fit flex-wrap p-3 bg-[#1a1a1a] bottom-16 ${tray?"hidden":"flex"}`}>
+      <div className={`absolute w-24 h-fit flex-wrap p-30 rounded-2xl -right-10 bg-[#1a1a1a] bottom-17 ${tray?"flex":"hidden"}`}>
         
         
         </div>  

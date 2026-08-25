@@ -12,7 +12,7 @@ interface AppsProps {
   clicked: boolean;
   selectedAppIds: string[];
   setSelectedAppIds: React.Dispatch<React.SetStateAction<string[]>>;
-  isAppDraggingRef: React.MutableRefObject<boolean>; // Added this prop
+  isAppDraggingRef: React.MutableRefObject<boolean>; 
 }
 
 const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selectedAppIds, setSelectedAppIds, isAppDraggingRef }: AppsProps) => {
@@ -43,6 +43,8 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
         const active = selectedAppIds.includes(app.id);
         const length = app.name.length
        
+
+        if(app.isOnDesktop)
         return (
           <motion.div 
             key={app.id || index}
@@ -62,7 +64,6 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
               }
             }}
             onDragStart={() => {
-              // Tell the background we started moving apps
               isAppDraggingRef.current = true;
             }}
             animate={{
@@ -159,7 +160,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
                 setSelectedAppIds([app.id]);
               }
 
-              // Let the flag turn false shortly AFTER the click bubbles up so it gets ignored
+              
               setTimeout(() => {
                 isAppDraggingRef.current = false;
               }, 150);
@@ -175,7 +176,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
           >
             <span className="text-black xs:text-sm font-mono relative h-full w-full p-5 flex items-center justify-center text-2xl" >
               {app.isIconpath ? (
-                <Image src={"/AppIcons/Settings.png"} alt='App icon' fill sizes='auto' className='px-2.5 py-0.5 object-contain' loading='eager' draggable={false}/>
+                <Image src={app.icon} alt='App icon' fill sizes='auto' className='px-2.5 py-0.5 object-contain' loading='eager' draggable={false}/>
               ) : (
                 app.icon
               )}

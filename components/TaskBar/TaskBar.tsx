@@ -16,6 +16,11 @@ const TaskBar = () => {
     const [Mode, setMode] = useState(4);
     const [name,setName]=useState("")
     const [tray,setTray]=useState(false)
+    const [search,setSearch]=useState("")
+    
+    useEffect(()=>{
+        SetMenuIndex(1)
+    },[search])
 
     useEffect(() => {
         setMounted(true)
@@ -44,11 +49,11 @@ const TaskBar = () => {
     const renderMenu = () => {
         switch (menuIndex) {
             case 0:
-                return <div className="w-full h-full"><MainMenu shutmenu={Menu} countdown={countdown} setCountdown={setCountdown} Mode={Mode} setMode={setMode}/></div>
+                return <div className="w-full h-full"><MainMenu setSearch={setSearch} search={search} shutmenu={Menu} countdown={countdown} setCountdown={setCountdown} Mode={Mode} setMode={setMode}/></div>
             case 1:
-                return <div className="w-full h-full"><SearchMenu/></div>
+                return <div className="w-full h-full"><SearchMenu setSearch={setSearch} search={search}/></div>
             default:
-                return <div className="w-full h-full"><MainMenu shutmenu={Menu} countdown={countdown} setCountdown={setCountdown}  Mode={Mode} setMode={setMode}/></div>
+                return <div className="w-full h-full"><MainMenu setSearch={setSearch} search={search} shutmenu={Menu} countdown={countdown} setCountdown={setCountdown} Mode={Mode} setMode={setMode}/></div>
         }
     }
  

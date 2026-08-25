@@ -4,9 +4,12 @@ export interface AppConfig {
   icon: string; 
   defaultCol: number;
   defaultRow: number;
-  isIconpath:boolean;
-  isPinnedtoStart:boolean;
-  ispinnedtoTaskbar:boolean;
+  isIconpath: boolean;
+  isPinnedtoStart: boolean;
+  ispinnedtoTaskbar: boolean;
+  open: boolean;
+  numId: number;
+  isOnDesktop: boolean;
 }
 
 export const DESKTOP_APPS: AppConfig[] = [
@@ -16,10 +19,12 @@ export const DESKTOP_APPS: AppConfig[] = [
     icon: "📄",
     defaultCol: 0,
     defaultRow: 0,
-    isIconpath:false,
-    isPinnedtoStart:false,
-    ispinnedtoTaskbar:false,
-
+    isIconpath: false,
+    isPinnedtoStart: false,
+    ispinnedtoTaskbar: false,
+    open: false,
+    numId: 0,
+    isOnDesktop: true,
   },
   {
     id: "projects",
@@ -27,21 +32,25 @@ export const DESKTOP_APPS: AppConfig[] = [
     icon: "📁",
     defaultCol: 0,
     defaultRow: 1,
-    isIconpath:false,
-    isPinnedtoStart:false,
-    ispinnedtoTaskbar:false,
-
+    isIconpath: false,
+    isPinnedtoStart: false,
+    ispinnedtoTaskbar: false,
+    open: false,
+    numId: 1,
+    isOnDesktop:true,
   },
   {
     id: "cmd",
     name: "cmd",
-    icon: "⌨️",
+    icon: "/AppIcons/Cmd.png",
     defaultCol: 0,
     defaultRow: 2,
-    isIconpath:false,
-    isPinnedtoStart:false,
-    ispinnedtoTaskbar:false,
-
+    isIconpath: true,
+    isPinnedtoStart: false,
+    ispinnedtoTaskbar: false,
+    open: false,
+    numId: 2,
+    isOnDesktop: false,
   },
   {
     id:"settings",
@@ -49,9 +58,24 @@ export const DESKTOP_APPS: AppConfig[] = [
     icon: "/AppIcons/Settings.png",
     defaultCol: 0,
     defaultRow: 3,
-    isIconpath:true,
-    isPinnedtoStart:false,
-    ispinnedtoTaskbar:false,
-
+    isIconpath: true,
+    isPinnedtoStart: false,
+    ispinnedtoTaskbar: false,
+    open: false,
+    numId: 3,
+    isOnDesktop: false,
+  },
+   {
+    id:"This_Pc",
+    name: "This PC",
+    icon: "/AppIcons/Settings.png",
+    defaultCol: 0,
+    defaultRow: 3,
+    isIconpath: true,
+    isPinnedtoStart: false,
+    ispinnedtoTaskbar: false,
+    open: false,
+    numId: 3,
+    isOnDesktop: false,
   }
 ];
