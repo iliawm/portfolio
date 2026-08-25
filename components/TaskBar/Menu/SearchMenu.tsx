@@ -39,7 +39,7 @@ const SearchMenu = ({setSearch,search}: MainMenuProps) => {
                           app.id.toLowerCase().includes(search.toLowerCase())
                       )
                       .map((app, index) => (
-                          <li key={app.id || index} className='w-7/10 h-fit flex items-center relative gap-3 hover:bg-gray-700 px-2 rounded-lg py-1'>
+                          <li key={app.id || index} className='w-7/10 h-fit flex items-center relative gap-3 hover:bg-gray-700 px-2 rounded-md py-1'>
                             {!app.isIconpath?
                             <div className='m-2 text-xl'>
                             {app.icon}
