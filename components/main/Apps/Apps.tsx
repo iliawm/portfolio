@@ -174,7 +174,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
             onDoubleClick={()=>{
               app.lastOpened = true
               const ex = document.cookie.match(app.name + app.lastOpened)
-              ex?"": document.cookie = `${app.name} + ${app.lastOpened} ; path=/; max-age=31536000"}`
+              ex?"": document.cookie = `${app.name} + ${app.lastOpened} ; expires=3600000}`
               console.log(app.name,app.lastOpened)
               handle_double_clicks()
             }}
