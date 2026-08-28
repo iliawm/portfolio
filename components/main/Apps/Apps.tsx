@@ -33,6 +33,7 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
   const handle_double_clicks=()=>{
     if(((Date.now()/1000)-lastClick)<=2){
       console.log("open")
+      
       window.alert("apps window not implemented yet")
     }
   }
@@ -171,6 +172,10 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
               handle_clicks()
             }}
             onDoubleClick={()=>{
+              app.lastOpened = true
+              const ex = document.cookie.match(app.name + app.lastOpened)
+              ex?"": document.cookie = `${app.name} + ${app.lastOpened} ; path=/; max-age=31536000"}`
+              console.log(app.name,app.lastOpened)
               handle_double_clicks()
             }}
           >

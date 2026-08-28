@@ -1,7 +1,7 @@
 export interface AppConfig {
   id: string;
   name: string;
-  icon: string; 
+  icon: string;
   defaultCol: number;
   defaultRow: number;
   isIconpath: boolean;
@@ -10,6 +10,7 @@ export interface AppConfig {
   open: boolean;
   numId: number;
   isOnDesktop: boolean;
+  lastOpened: boolean | null; 
 }
 
 export const DESKTOP_APPS: AppConfig[] = [
@@ -25,6 +26,7 @@ export const DESKTOP_APPS: AppConfig[] = [
     open: false,
     numId: 0,
     isOnDesktop: true,
+    lastOpened: null,
   },
   {
     id: "projects",
@@ -37,7 +39,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     ispinnedtoTaskbar: false,
     open: false,
     numId: 1,
-    isOnDesktop:true,
+    isOnDesktop: true,
+    lastOpened: null,
   },
   {
     id: "cmd",
@@ -51,9 +54,10 @@ export const DESKTOP_APPS: AppConfig[] = [
     open: false,
     numId: 2,
     isOnDesktop: false,
+    lastOpened: null,
   },
   {
-    id:"settings",
+    id: "settings",
     name: "settings",
     icon: "/AppIcons/Settings.png",
     defaultCol: 0,
@@ -64,9 +68,10 @@ export const DESKTOP_APPS: AppConfig[] = [
     open: false,
     numId: 3,
     isOnDesktop: false,
+    lastOpened: null,
   },
-   {
-    id:"This_Pc",
+  {
+    id: "This_Pc",
     name: "This PC",
     icon: "/AppIcons/Settings.png",
     defaultCol: 0,
@@ -77,5 +82,6 @@ export const DESKTOP_APPS: AppConfig[] = [
     open: false,
     numId: 3,
     isOnDesktop: false,
-  }
+    lastOpened: null,
+  },
 ];
