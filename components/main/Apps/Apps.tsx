@@ -18,13 +18,25 @@ interface AppsProps {
 const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selectedAppIds, setSelectedAppIds, isAppDraggingRef }: AppsProps) => {
   const [lastClick,SetLastClick]=useState(0)
   const [rename,setRename]=useState(true)
- 
+  const [openedApps,SetOpenedApps]=useState<string[]>([])
   useEffect(()=>{
     if(clicked===true){
       setSelectedAppIds([])
     }
   },[clicked])
+  useEffect(()=>{
+    const StoreApps= localStorage.getItem("apps")
+    if(StoreApps){
+      SetOpenedApps(JSON.parse(StoreApps))
+      console.log(StoreApps)
+    }
+  },[])
+  useEffect(() => {
   
+  if (openedApps.length > 0) {
+    localStorage.setItem("apps", JSON.stringify(openedApps));
+  }
+}, [openedApps]);
   const handle_clicks=()=>{
     const seconds = (Date.now()/1000)
     SetLastClick(seconds)
@@ -172,10 +184,10 @@ const Apps = ({ gridSize, appsState, setAppsState, containerRef , clicked, selec
               handle_clicks()
             }}
             onDoubleClick={()=>{
-              app.lastOpened = true
-              const ex = document.cookie.match(app.name + app.lastOpened)
-              ex?"": document.cookie = `${app.name} + ${app.lastOpened} ; expires=3600000}`
-              console.log(app.name,app.lastOpened)
+              if(!openedApps.includes(app.id)){
+                SetOpenedApps((prev)=>[...prev , app.id])
+              } 
+              
               handle_double_clicks()
             }}
           >
