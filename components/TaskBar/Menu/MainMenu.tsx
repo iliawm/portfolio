@@ -5,6 +5,8 @@ import { FaPowerOff } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { MdRestartAlt } from "react-icons/md";
 import { IoMoonOutline } from "react-icons/io5";
+import { DESKTOP_APPS } from "@/config/Apps/config";
+
 
 interface MainMenuProps {
     shutmenu: boolean;
@@ -18,6 +20,7 @@ interface MainMenuProps {
 
 const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode ,setSearch,search}: MainMenuProps) => {
     const [menu, setMenu] = useState(false);
+    const [apps] = useState(DESKTOP_APPS);
 
     useEffect(() => {
         if (countdown === 0) return;
@@ -61,7 +64,32 @@ const MainMenu = ({ shutmenu, countdown, setCountdown, Mode, setMode ,setSearch,
                             <div className="icon"><RiArrowRightWideLine /></div>
                         </button>
                     </div>
-                    <div></div>
+                    <ul className="flex w-full overflow-x-scroll h-full hide-scrollbar gap-2 ml-3">
+                    {apps.map((app, i) => {
+                        if (app.isPinnedtoStart) {
+                        return (
+                            <li
+                            key={i}
+                            className="w-18 h-fit flex-col flex items-center relative gap-3 hover:bg-gray-700 px-2 rounded-md select-none "
+                            >
+                            {!app.isIconpath ? (
+                                <div className="text-lg">{app.icon}</div>
+                            ) : (
+                                <Image
+                                src={app.icon}
+                                width={50}
+                                height={50}
+                                alt={app.id}
+                                className="w-7"
+                                />
+                            )}
+                            <span className="text-wrap cursor-default ">{app.name}</span>
+                            </li>
+                        );
+                        }
+                       
+                    })}
+                    </ul>
                 </section>
 
                 <section className="w-full h-fit min-h-30 flex flex-col">

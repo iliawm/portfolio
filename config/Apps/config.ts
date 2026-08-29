@@ -84,4 +84,5 @@ export const DESKTOP_APPS: AppConfig[] = [
     isOnDesktop: false,
     lastOpened: null,
   },
+  
 ];
