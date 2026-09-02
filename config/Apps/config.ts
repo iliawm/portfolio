@@ -51,7 +51,7 @@ export const DESKTOP_APPS: AppConfig[] = [
     isIconpath: true,
     isPinnedtoStart: false,
     ispinnedtoTaskbar: false,
-    open: false,
+    open: true,
     numId: 2,
     isOnDesktop: false,
     lastOpened: null,

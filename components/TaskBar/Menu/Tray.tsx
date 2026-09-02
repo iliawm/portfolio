@@ -1,16 +1,17 @@
-import { DESKTOP_APPS } from "@/config/Apps/config";
-import { useTheme } from "next-themes";
+"use client";
+
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { IoIosArrowUp } from "react-icons/io";
+import { useAppsStore } from "@/store/useAppsStore";
+import { useShallow } from "zustand/react/shallow";
 
 const Tray = ({ tray }: { tray: boolean }) => {
-  const [apps] = useState(DESKTOP_APPS);
+  const openApps = useAppsStore(
+    useShallow((s) => s.apps.filter((app) => app.open))
+  );
 
-  const closedApps = apps.filter((app) => app.open);
-
-  const cols = Math.min(closedApps.length, 3);
-  const rows = Math.ceil(closedApps.length / 3);
+  const cols = Math.min(openApps.length, 3);
+  const rows = Math.ceil(openApps.length / 3) || 1;
 
   return (
     <div className="flex justify-center h-full">
@@ -19,11 +20,11 @@ const Tray = ({ tray }: { tray: boolean }) => {
           width: `${cols * 72 + 40}px`,
           height: `${rows * 100 + 40}px`,
         }}
-        className={`absolute grid grid-cols-3 rounded-2xl p-5 gap-2 -right-10 bg-[#1a1a1a] bottom-17 ${
+        className={`absolute grid grid-cols-3 rounded-2xl p-5 gap-5 -right-10 bg-[#1a1a1a]/85 backdrop-blur-2xl bottom-17 ${
           tray ? "grid" : "hidden"
         }`}
       >
-        {closedApps.map((app, index) => (
+        {openApps.map((app, index) => (
           <li
             key={app.id || index}
             className="w-18 h-fit flex flex-col items-center gap-3 hover:bg-gray-700 px-2 py-2 rounded-md select-none"
@@ -33,20 +34,16 @@ const Tray = ({ tray }: { tray: boolean }) => {
             ) : (
               <Image
                 src={app.icon}
-                width={50}
-                height={50}
+                width={30}
+                height={30}
                 alt={app.id}
-                className="w-7 h-7 object-contain"
+                className="w-5 h-5 object-contain"
               />
             )}
-
-            <span className="text-wrap text-center">
-              {app.name}
-            </span>
+            <span className="text-wrap text-center">{app.name}</span>
           </li>
         ))}
       </ul>
-
       <div className="transition-all flex items-center px-2 ease-in-out duration-400 hover:bg-gray-600 h-full">
         <div
           className={`${
@@ -59,4 +56,5 @@ const Tray = ({ tray }: { tray: boolean }) => {
     </div>
   );
 };
-export default Tray
+
+export default Tray;

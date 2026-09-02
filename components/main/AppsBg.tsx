@@ -1,64 +1,70 @@
-"use client"
-import { useEffect, useRef, useState } from "react"
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Apps from "./Apps/Apps";
-import { DESKTOP_APPS } from '@/config/Apps/config'; 
+import { useAppsStore } from "@/store/useAppsStore";
 
 const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
-  const isAppDraggingRef = useRef(false); 
+  const isAppDraggingRef = useRef(false);
   const gridSize = 80;
-  const [appsState, setAppsState] = useState(DESKTOP_APPS);
-  const [Clicked,setClicked]=useState(false)
-  const [RClicked,setRClicked]=useState(false)
+
+  const apps = useAppsStore((s) => s.apps);
+  const selectedAppIds = useAppsStore((s) => s.selectedAppIds);
+  const setSelectedAppIds = useAppsStore((s) => s.setSelectedAppIds);
+
+  const [Clicked, setClicked] = useState(false);
+  const [RClicked, setRClicked] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [isSelecting, setIsSelecting] = useState(false);
-  const [selectionBox, setSelectionBox] = useState({ startX: 0, startY: 0, currentX: 0, currentY: 0 });
-  const [selectedAppIds, setSelectedAppIds] = useState<string[]>([]);
-  
-  useEffect(()=>{
-    if(RClicked){
-      setRClicked(false)
-    }
-  },[Clicked])
-  
-  const handle_contextmenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if(RClicked){
-      setMenuPosition({x:e.clientX,y:e.clientY})
-    }
-    if(!RClicked){
-      setRClicked(true)
-      setMenuPosition({x:e.clientX,y:e.clientY})
-    }
-  }
+  const [selectionBox, setSelectionBox] = useState({
+    startX: 0,
+    startY: 0,
+    currentX: 0,
+    currentY: 0,
+  });
 
-  const handle_Deselection=()=>{
-   
+  useEffect(() => {
+    if (RClicked) {
+      setRClicked(false);
+    }
+  }, [Clicked]);
+
+  const handle_contextmenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (RClicked) {
+      setMenuPosition({ x: e.clientX, y: e.clientY });
+    }
+    if (!RClicked) {
+      setRClicked(true);
+      setMenuPosition({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handle_Deselection = () => {
     if (isDraggingRef.current || isAppDraggingRef.current) return;
-    
-    setClicked(true)
-    setSelectedAppIds([])
-        
+    setClicked(true);
+    setSelectedAppIds([]);
     setTimeout(() => {
-      setClicked(false)
+      setClicked(false);
     }, 100);
-  }
+  };
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     if (e.target !== containerRef.current) return;
-    
+
     isDraggingRef.current = false;
-    if(RClicked){
-      setRClicked(false)
+    if (RClicked) {
+      setRClicked(false);
     }
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     setIsSelecting(true);
     setSelectionBox({ startX: x, startY: y, currentX: x, currentY: y });
     setSelectedAppIds([]);
@@ -66,9 +72,9 @@ const AppsBg = () => {
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isSelecting) return;
-    
+
     isDraggingRef.current = true;
-    
+
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = e.clientX - rect.left;
@@ -81,18 +87,20 @@ const AppsBg = () => {
       const boxWidth = Math.abs(updated.currentX - updated.startX);
       const boxHeight = Math.abs(updated.currentY - updated.startY);
 
-      const newlySelectedIds = appsState.filter((app) => {
-        const appLeft = app.defaultCol * gridSize;
-        const appTop = app.defaultRow * gridSize;
-        const appWidth = gridSize;
-        const appHeight = gridSize;
-        return (
-          appLeft < boxLeft + boxWidth &&
-          appLeft + appWidth > boxLeft &&
-          appTop < boxTop + boxHeight &&
-          appTop + appHeight > boxTop
-        );
-      }).map((app) => app.id);
+      const newlySelectedIds = apps
+        .filter((app) => {
+          const appLeft = app.defaultCol * gridSize;
+          const appTop = app.defaultRow * gridSize;
+          const appWidth = gridSize;
+          const appHeight = gridSize;
+          return (
+            appLeft < boxLeft + boxWidth &&
+            appLeft + appWidth > boxLeft &&
+            appTop < boxTop + boxHeight &&
+            appTop + appHeight > boxTop
+          );
+        })
+        .map((app) => app.id);
 
       setSelectedAppIds(newlySelectedIds);
       return updated;
@@ -111,29 +119,25 @@ const AppsBg = () => {
   const boxHeight = Math.abs(selectionBox.currentY - selectionBox.startY);
 
   return (
-    <div 
-      className="w-full h-screen absolute inset-0 z-20 overflow-hidden flex select-none" 
+    <div
+      className="w-full h-screen absolute inset-0 z-20 overflow-hidden flex select-none"
       ref={containerRef}
       onContextMenu={handle_contextmenu}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onClick={()=>{
-        handle_Deselection()
+      onClick={() => {
+        handle_Deselection();
       }}
     >
-      <Apps 
-        gridSize={gridSize} 
-        appsState={appsState}           
-        setAppsState={setAppsState}    
+      <Apps
+        gridSize={gridSize}
         containerRef={containerRef}
         clicked={Clicked}
-        selectedAppIds={selectedAppIds}
-        setSelectedAppIds={setSelectedAppIds}
         isAppDraggingRef={isAppDraggingRef}
       />
       {RClicked && (
-        <div 
+        <div
           className="absolute z-50 w-56 transition-all bg-[#202020]/90 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl p-1 text-white text-xs select-none flex flex-col gap-0.5"
           style={{ top: menuPosition.y, left: menuPosition.x }}
           onClick={(e) => e.stopPropagation()}
@@ -171,7 +175,7 @@ const AppsBg = () => {
         </div>
       )}
       {isSelecting && (
-        <div 
+        <div
           className="absolute bg-blue-500/20 border border-blue-500/60 pointer-events-none z-30"
           style={{
             left: `${boxLeft}px`,
@@ -182,7 +186,7 @@ const AppsBg = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
 export default AppsBg;
