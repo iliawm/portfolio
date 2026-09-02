@@ -8,7 +8,7 @@ const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const isAppDraggingRef = useRef(false);
-  const gridSize = 80;
+  const gridSize = 90;
 
   const apps = useAppsStore((s) => s.apps);
   const selectedAppIds = useAppsStore((s) => s.selectedAppIds);
@@ -70,42 +70,46 @@ const AppsBg = () => {
     setSelectedAppIds([]);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isSelecting) return;
+const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  if (!isSelecting) return;
 
-    isDraggingRef.current = true;
+  isDraggingRef.current = true;
 
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  const rect = containerRef.current?.getBoundingClientRect();
+  if (!rect) return;
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-    setSelectionBox((prev) => {
-      const updated = { ...prev, currentX: x, currentY: y };
-      const boxLeft = Math.min(updated.startX, updated.currentX);
-      const boxTop = Math.min(updated.startY, updated.currentY);
-      const boxWidth = Math.abs(updated.currentX - updated.startX);
-      const boxHeight = Math.abs(updated.currentY - updated.startY);
-
-      const newlySelectedIds = apps
-        .filter((app) => {
-          const appLeft = app.defaultCol * gridSize;
-          const appTop = app.defaultRow * gridSize;
-          const appWidth = gridSize;
-          const appHeight = gridSize;
-          return (
-            appLeft < boxLeft + boxWidth &&
-            appLeft + appWidth > boxLeft &&
-            appTop < boxTop + boxHeight &&
-            appTop + appHeight > boxTop
-          );
-        })
-        .map((app) => app.id);
-
-      setSelectedAppIds(newlySelectedIds);
-      return updated;
-    });
+  const updated = {
+    startX: selectionBox.startX,
+    startY: selectionBox.startY,
+    currentX: x,
+    currentY: y,
   };
+
+  const boxLeft = Math.min(updated.startX, updated.currentX);
+  const boxTop = Math.min(updated.startY, updated.currentY);
+  const boxWidth = Math.abs(updated.currentX - updated.startX);
+  const boxHeight = Math.abs(updated.currentY - updated.startY);
+
+  const newlySelectedIds = apps
+    .filter((app) => {
+      const appLeft = app.defaultCol * gridSize;
+      const appTop = app.defaultRow * gridSize;
+      const appWidth = gridSize;
+      const appHeight = gridSize;
+      return (
+        appLeft < boxLeft + boxWidth &&
+        appLeft + appWidth > boxLeft &&
+        appTop < boxTop + boxHeight &&
+        appTop + appHeight > boxTop
+      );
+    })
+    .map((app) => app.id);
+
+  setSelectionBox(updated);
+  setSelectedAppIds(newlySelectedIds);
+};
 
   const handleMouseUp = () => {
     if (isSelecting) {
