@@ -17,6 +17,7 @@ interface MainMenuProps {
   setMode: React.Dispatch<React.SetStateAction<number>>;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
   search: string;
+  onAppOpen?: () => void;
 }
 
 const MainMenu = ({
@@ -27,9 +28,11 @@ const MainMenu = ({
   setMode,
   setSearch,
   search,
+  onAppOpen,
 }: MainMenuProps) => {
   const [menu, setMenu] = useState(false);
   const apps = useAppsStore((s) => s.apps);
+  const openApp = useAppsStore((s) => s.openApp);
 
   useEffect(() => {
     if (countdown === 0) return;
@@ -55,81 +58,93 @@ const MainMenu = ({
     }
   }, [shutmenu]);
 
+  const handleOpen = (id: string) => {
+    openApp(id);
+    onAppOpen?.();
+  };
+
   return (
-    <div className="w-full h-full p-7 pb-0 flex flex-col gap-5">
-      <section className="search px-3 w-full h-12 flex gap-4 items-center ring ring-gray-700/80 rounded-sm border-b-2 border-purple-700">
-        <button className="flex scale-x-[-1] cursor-pointer">
+    <div className="flex h-full w-full flex-col gap-5 p-7 pb-0">
+      <section className="search flex h-12 w-full items-center gap-4 rounded-sm border-b-2 border-purple-700 px-3 ring ring-gray-700/80">
+        <button type="button" className="flex scale-x-[-1] cursor-pointer">
           <IoIosSearch />
         </button>
         <input
           type="text"
-          className="w-full h-full focus:outline-0"
+          className="h-full w-full focus:outline-0"
           placeholder="Type here to search"
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-          }}
+          onChange={(e) => setSearch(e.target.value)}
           autoFocus
         />
       </section>
 
-      <div className="w-full h-full flex flex-col justify-start gap-5 rounded-xl">
-        <section className="w-full h-fit min-h-30 flex flex-col">
-          <div className="flex justify-between items-center px-5 py-3">
+      <div className="flex h-full w-full flex-col justify-start gap-5 rounded-xl">
+        <section className="flex h-fit min-h-30 w-full flex-col">
+          <div className="flex items-center justify-between px-5 py-3">
             <h1>Pinned</h1>
-            <button className="flex gap-1 items-center bg-[#343434]/70 backdrop-blur-2xl px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
+            <button
+              type="button"
+              className="flex cursor-pointer items-center gap-1 rounded-lg bg-[#343434]/70 px-2 py-1 backdrop-blur-2xl hover:scale-[1.07] active:scale-[1]"
+            >
               <h3>All apps</h3>
               <div className="icon">
                 <RiArrowRightWideLine />
               </div>
             </button>
           </div>
-          <ul className="flex w-full overflow-x-scroll h-full hide-scrollbar gap-2 ml-3">
-            {apps.map((app, i) => {
-              if (app.isPinnedtoStart) {
-                return (
-                  <li
-                    key={i}
-                    className="w-18 h-fit flex-col flex items-center relative gap-3 hover:bg-gray-700 px-2 rounded-md select-none "
-                  >
-                    {!app.isIconpath ? (
-                      <div className="text-lg">{app.icon}</div>
-                    ) : (
-                      <Image
-                        src={app.icon}
-                        width={50}
-                        height={50}
-                        alt={app.id}
-                        className="w-7"
-                      />
-                    )}
-                    <span className="text-wrap cursor-default ">
-                      {app.name}
-                    </span>
-                  </li>
-                );
-              }
+          <ul className="ml-3 flex h-full w-full gap-2 overflow-x-scroll hide-scrollbar">
+            {apps.map((app) => {
+              if (!app.isPinnedtoStart) return null;
+              return (
+                <li
+                  key={app.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleOpen(app.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleOpen(app.id);
+                  }}
+                  className="relative flex h-fit w-18 cursor-pointer select-none flex-col items-center gap-3 rounded-md px-2 hover:bg-gray-700"
+                >
+                  {!app.isIconpath ? (
+                    <div className="text-lg">{app.icon}</div>
+                  ) : (
+                    <Image
+                      src={app.icon}
+                      width={50}
+                      height={50}
+                      alt={app.id}
+                      className="w-7"
+                    />
+                  )}
+                  <span className="text-wrap">{app.name}</span>
+                </li>
+              );
             })}
           </ul>
         </section>
 
-        <section className="w-full h-fit min-h-30 flex flex-col">
-          <div className="flex justify-between items-center px-5 py-3">
+        <section className="flex h-fit min-h-30 w-full flex-col">
+          <div className="flex items-center justify-between px-5 py-3">
             <h1>Recommended</h1>
-            <button className="flex gap-1 items-center bg-[#343434]/70 backdrop-blur-2xl px-2 py-1 rounded-lg cursor-pointer hover:scale-[1.07] active:scale-[1]">
+            <button
+              type="button"
+              className="flex cursor-pointer items-center gap-1 rounded-lg bg-[#343434]/70 px-2 py-1 backdrop-blur-2xl hover:scale-[1.07] active:scale-[1]"
+            >
               <h3>More</h3>
               <div className="icon">
                 <RiArrowRightWideLine />
               </div>
             </button>
           </div>
-          <div></div>
+          <div />
         </section>
       </div>
 
-      <div className="profile flex items-center justify-between relative bottom-0 w-full h-20 px-3 mb-1">
-        <div className="User flex gap-2 items-center py-4">
-          <div className="w-8 h-8 relative">
+      <div className="profile relative bottom-0 mb-1 flex h-20 w-full items-center justify-between px-3">
+        <div className="User flex items-center gap-2 py-4">
+          <div className="relative h-8 w-8">
             <Image
               src={"/pfp/me.jpg"}
               fill
@@ -143,21 +158,23 @@ const MainMenu = ({
 
         <div className="buttons flex justify-center">
           <button
-            className={`shotdown transition-all ease-linear duration-400 hover:bg-gray-600 ${
-              menu ? "bg-gray-600 animate-pulse" : ""
-            } transition-all duration-100 ease-linear px-3 py-2 cursor-pointer rounded-lg hover:scale-[1.06] active:scale-[1]`}
+            type="button"
+            className={`shotdown cursor-pointer rounded-lg px-3 py-2 transition-all duration-100 ease-linear hover:scale-[1.06] hover:bg-gray-600 active:scale-[1] ${
+              menu ? "animate-pulse bg-gray-600" : ""
+            }`}
             onClick={() => setMenu(!menu)}
           >
             <FaPowerOff />
           </button>
 
           <div
-            className={`absolute w-fit mr-10 bg-[#1a1a1a]/40 backdrop-blur-2xl bottom-15 shadow shadow-gray-700/60 rounded-xl border border-gray-700/40 p-3 px-4 flex flex-col transition-all ease-linear h-fit ${
-              menu ? "opacity-100" : "opacity-0 pointer-events-none"
-            } text-sm border-gray-700/60`}
+            className={`absolute bottom-15 mr-10 flex h-fit w-fit flex-col rounded-xl border border-gray-700/40 bg-[#1a1a1a]/40 p-3 px-4 text-sm shadow shadow-gray-700/60 backdrop-blur-2xl transition-all ease-linear ${
+              menu ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
           >
             <button
-              className="shotdown flex gap-2.5 items-center text-nowrap cursor-pointer hover:scale-[1.05] active:scale-[1] transition-all ease-linear hover:bg-white/10 rounded-md px-1 py-1"
+              type="button"
+              className="shotdown flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1 text-nowrap transition-all ease-linear hover:scale-[1.05] hover:bg-white/10 active:scale-[1]"
               onClick={() => {
                 setMode(2);
                 setCountdown(10);
@@ -170,7 +187,8 @@ const MainMenu = ({
             </button>
 
             <button
-              className="shotdown flex gap-2.5 items-center text-nowrap cursor-pointer hover:scale-[1.05] active:scale-[1] transition-all ease-linear hover:bg-white/10 rounded-md px-1 py-1"
+              type="button"
+              className="shotdown flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1 text-nowrap transition-all ease-linear hover:scale-[1.05] hover:bg-white/10 active:scale-[1]"
               onClick={() => {
                 setMode(0);
                 setCountdown(10);
@@ -183,7 +201,8 @@ const MainMenu = ({
             </button>
 
             <button
-              className="shotdown flex gap-2.5 items-center text-nowrap cursor-pointer hover:scale-[1.05] active:scale-[1] transition-all ease-linear hover:bg-white/10 rounded-md px-1 py-1"
+              type="button"
+              className="shotdown flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1 text-nowrap transition-all ease-linear hover:scale-[1.05] hover:bg-white/10 active:scale-[1]"
               onClick={() => {
                 setMode(1);
                 setCountdown(10);

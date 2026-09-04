@@ -23,7 +23,6 @@ const TaskBar = () => {
 
   const apps = useAppsStore((s) => s.apps);
   const openApps = apps.filter((app) => app.open);
-  const toggleApp = useAppsStore((s) => s.toggleApp);
 
   useEffect(() => {
     SetMenuIndex(1);
@@ -44,6 +43,8 @@ const TaskBar = () => {
     if (Mode === 1) setName("FrontEnd Mentor");
   }, [Mode]);
 
+  const closeMenu = () => SetMenu(false);
+
   const renderMenu = () => {
     switch (menuIndex) {
       case 0:
@@ -57,13 +58,18 @@ const TaskBar = () => {
               setCountdown={setCountdown}
               Mode={Mode}
               setMode={setMode}
+              onAppOpen={closeMenu}
             />
           </div>
         );
       case 1:
         return (
           <div className="h-full w-full">
-            <SearchMenu setSearch={setSearch} search={search} />
+            <SearchMenu
+              setSearch={setSearch}
+              search={search}
+              onAppOpen={closeMenu}
+            />
           </div>
         );
       default:
@@ -77,6 +83,7 @@ const TaskBar = () => {
               setCountdown={setCountdown}
               Mode={Mode}
               setMode={setMode}
+              onAppOpen={closeMenu}
             />
           </div>
         );
@@ -86,8 +93,8 @@ const TaskBar = () => {
   if (!mounted) {
     return (
       <section className="invisible fixed bottom-0 flex h-15 w-full items-center justify-center gap-2 bg-[#1A1A1A] py-2 md:visible">
-        <div className="h-12 w-12"></div>
-        <div className="h-12 w-12"></div>
+        <div className="h-12 w-12" />
+        <div className="h-12 w-12" />
       </section>
     );
   }
@@ -128,15 +135,14 @@ const TaskBar = () => {
       </div>
 
       <button
+        type="button"
         className={`relative h-full w-12 cursor-pointer rounded-lg hover:scale-[1.1] active:scale-[1] ${
           menuIndex === 0 && Menu
             ? theme === "dark"
               ? "bg-gray-600"
               : "bg-gray-200"
             : ""
-        } ${
-          theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"
-        }`}
+        } ${theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"}`}
         onClick={() => {
           if (menuIndex !== 0 && Menu) {
             SetMenu(true);
@@ -158,15 +164,14 @@ const TaskBar = () => {
       </button>
 
       <button
+        type="button"
         className={`relative h-full w-12 cursor-pointer rounded-lg hover:scale-[1.1] active:scale-[1] ${
           menuIndex === 1 && Menu
             ? theme === "dark"
               ? "bg-gray-600"
               : "bg-gray-200"
             : ""
-        } ${
-          theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"
-        }`}
+        } ${theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"}`}
         onClick={() => {
           if (menuIndex !== 1 && Menu) {
             SetMenu(true);
@@ -186,31 +191,31 @@ const TaskBar = () => {
         </div>
       </button>
 
-     <div className="flex h-full items-center gap-1">
+      <div className="flex h-full items-center gap-1">
         {openApps.map((app) => (
-            <button
+          <button
             key={app.id}
             type="button"
             title={app.name}
-            className={`relative flex h-full w-12 items-center justify-center rounded-lg transition-all hover:scale-[1.08] active:scale-100 ${
-                theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"
-            } bg-white/10`}
-            >
+            className={`relative flex h-full w-12 items-center justify-center rounded-lg bg-white/10 transition-all hover:scale-[1.08] active:scale-100 ${
+              theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"
+            }`}
+          >
             {!app.isIconpath ? (
-                <span className="text-xl leading-none">{app.icon}</span>
+              <span className="text-xl leading-none">{app.icon}</span>
             ) : (
-                <Image
+              <Image
                 src={app.icon}
                 width={28}
                 height={28}
                 alt={app.id}
                 className="h-7 w-7 object-contain"
-                />
+              />
             )}
             <span className="absolute bottom-1 left-1/2 h-0.75 w-4 -translate-x-1/2 rounded-full bg-white/80" />
-            </button>
+          </button>
         ))}
-        </div>
+      </div>
 
       <div className="absolute right-0 mr-4 h-full">
         <button
