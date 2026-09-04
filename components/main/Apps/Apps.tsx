@@ -57,7 +57,7 @@ const Apps = ({
           <motion.div
             key={app.id || index}
             className={`absolute hidden cursor-pointer select-none md:flex ${
-              active ? "bg-white/20 outline outline-1 outline-white/40" : ""
+              active ? "bg-white/20 outline  outline-white/40" : ""
             } flex-col items-center justify-start rounded-md hover:bg-white/10 active:scale-95`}
             style={{
               width: `${gridSize}px`,
@@ -204,6 +204,7 @@ const Apps = ({
               handle_double_clicks(app.id);
             }}
           >
+            
             <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center">
               {app.isIconpath ? (
                 <Image

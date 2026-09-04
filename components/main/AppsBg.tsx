@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Apps from "./Apps/Apps";
 import { useAppsStore } from "@/store/useAppsStore";
+import WindowManager from "./Windows/WindowManager";
 
 const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -134,12 +135,14 @@ const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         handle_Deselection();
       }}
     >
+      
       <Apps
         gridSize={gridSize}
         containerRef={containerRef}
         clicked={Clicked}
         isAppDraggingRef={isAppDraggingRef}
       />
+      <WindowManager />
       {RClicked && (
         <div
           className="absolute z-50 w-56 transition-all bg-[#202020]/90 backdrop-blur-md border border-white/10 rounded-lg shadow-2xl p-1 text-white text-xs select-none flex flex-col gap-0.5"
