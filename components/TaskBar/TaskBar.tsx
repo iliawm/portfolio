@@ -23,6 +23,8 @@ const TaskBar = () => {
 
   const apps = useAppsStore((s) => s.apps);
   const openApps = apps.filter((app) => app.open);
+  const restoreApp = useAppsStore((s) => s.restoreApp);
+  const toggleMinimize = useAppsStore((s) => s.toggleMinimize);
 
   useEffect(() => {
     SetMenuIndex(1);
@@ -197,9 +199,13 @@ const TaskBar = () => {
             key={app.id}
             type="button"
             title={app.name}
-            className={`relative flex h-full w-12 items-center justify-center rounded-lg bg-white/10 transition-all hover:scale-[1.08] active:scale-100 ${
+            onClick={() => {
+              if (app.minimized) restoreApp(app.id);
+              else toggleMinimize(app.id);
+            }}
+            className={`relative flex h-full w-12 items-center justify-center rounded-lg transition-all hover:scale-[1.08] active:scale-100 ${
               theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-200"
-            }`}
+            } ${app.minimized ? "bg-white/5 opacity-70" : "bg-white/10"}`}
           >
             {!app.isIconpath ? (
               <span className="text-xl leading-none">{app.icon}</span>
@@ -212,7 +218,11 @@ const TaskBar = () => {
                 className="h-7 w-7 object-contain"
               />
             )}
-            <span className="absolute bottom-1 left-1/2 h-0.75 w-4 -translate-x-1/2 rounded-full bg-white/80" />
+            <span
+              className={`absolute bottom-1 left-1/2 h-0.75 w-4 -translate-x-1/2 rounded-full ${
+                app.minimized ? "bg-white/40" : "bg-white/80"
+              }`}
+            />
           </button>
         ))}
       </div>

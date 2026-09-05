@@ -2,19 +2,24 @@
 
 import WindowFrame from "../WindowFrame";
 
-export default function Projects({
+export default function Settings({
   onClose,
+  onMinimize,
+  minimized,
 }: {
   id: string;
   onClose: () => void;
+  onMinimize: () => void;
+  minimized?: boolean;
 }) {
   return (
-    <WindowFrame title="Projects" onClose={onClose}>
-      <ul className="list-disc space-y-1 pl-4">
-        <li>Portfolio (this OS)</li>
-        <li>ShoppingWebsite</li>
-        <li>More coming soon</li>
-      </ul>
+    <WindowFrame
+      title="Settings"
+      onClose={onClose}
+      onMinimize={onMinimize}
+      minimized={minimized}
+    >
+      <p>Settings panel placeholder.</p>
     </WindowFrame>
   );
 }

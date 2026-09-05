@@ -13,9 +13,9 @@ const Tray = ({ tray }: { tray: boolean }) => {
   const rows = Math.ceil(openApps.length / 3) || 1;
 
   return (
-    <div className="relative flex h-full items-center">
+    <div className="relative flex h-full items-center ">
       {tray && (
-        <div className="absolute right-0 bottom-14 z-50 min-w-[180px] rounded-xl border border-white/10 bg-[#2c2c2c]/95 p-2 shadow-2xl backdrop-blur-xl">
+        <div className="absolute right-0 bottom-14 z-50 min-w-45 mb-2 rounded-xl border border-white/10 bg-[#2c2c2c]/95 p-2 shadow-2xl backdrop-blur-xl">
           {openApps.length === 0 ? (
             <div className="px-3 py-4 text-center text-xs text-white/50">
               No open apps
@@ -31,7 +31,7 @@ const Tray = ({ tray }: { tray: boolean }) => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") openApp(app.id);
                   }}
-                  className="flex w-[56px] cursor-pointer flex-col items-center gap-1 rounded-md px-1 py-2 hover:bg-white/10"
+                  className="flex w-14 cursor-pointer flex-col items-center gap-1 rounded-md px-1 py-2 hover:bg-white/10"
                 >
                   <div className="flex h-8 w-8 items-center justify-center">
                     {!app.isIconpath ? (

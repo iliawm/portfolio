@@ -7,10 +7,14 @@ const Cmd = dynamic(() => import("./apps/Cmd"));
 const Settings = dynamic(() => import("./apps/Settings"));
 const ThisPc = dynamic(() => import("./apps/ThisPc"));
 
-export const APP_WINDOWS: Record<
-  string,
-  ComponentType<{ id: string; onClose: () => void }>
-> = {
+export type WindowProps = {
+  id: string;
+  onClose: () => void;
+  onMinimize: () => void;
+  minimized?: boolean;
+};
+
+export const APP_WINDOWS: Record<string, ComponentType<WindowProps>> = {
   "about-me": AboutMe,
   projects: Projects,
   cmd: Cmd,

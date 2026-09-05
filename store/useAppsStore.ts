@@ -3,23 +3,30 @@
 import { create } from "zustand";
 import { DESKTOP_APPS, type AppConfig } from "@/config/Apps/config";
 
+export type AppConfigWithWindow = AppConfig & {
+  minimized?: boolean;
+};
+
 interface AppsState {
-  apps: AppConfig[];
+  apps: AppConfigWithWindow[];
   selectedAppIds: string[];
   setSelectedAppIds: (ids: string[]) => void;
   openApp: (id: string) => void;
   closeApp: (id: string) => void;
   toggleApp: (id: string) => void;
+  minimizeApp: (id: string) => void;
+  restoreApp: (id: string) => void;
+  toggleMinimize: (id: string) => void;
   updateAppPosition: (id: string, col: number, row: number) => void;
   updateMultiplePositions: (
     updates: { id: string; col: number; row: number }[]
   ) => void;
-  getOpenApps: () => AppConfig[];
-  getPinnedToStart: () => AppConfig[];
+  getOpenApps: () => AppConfigWithWindow[];
+  getPinnedToStart: () => AppConfigWithWindow[];
 }
 
 export const useAppsStore = create<AppsState>((set, get) => ({
-  apps: DESKTOP_APPS.map((app) => ({ ...app })),
+  apps: DESKTOP_APPS.map((app) => ({ ...app, minimized: false })),
   selectedAppIds: [],
 
   setSelectedAppIds: (ids) => set({ selectedAppIds: ids }),
@@ -28,7 +35,7 @@ export const useAppsStore = create<AppsState>((set, get) => ({
     set((state) => ({
       apps: state.apps.map((app) =>
         app.id === id
-          ? { ...app, open: true, lastOpened: true }
+          ? { ...app, open: true, lastOpened: true, minimized: false }
           : app
       ),
     })),
@@ -36,7 +43,9 @@ export const useAppsStore = create<AppsState>((set, get) => ({
   closeApp: (id) =>
     set((state) => ({
       apps: state.apps.map((app) =>
-        app.id === id ? { ...app, open: false } : app
+        app.id === id
+          ? { ...app, open: false, minimized: false }
+          : app
       ),
     })),
 
@@ -48,8 +57,30 @@ export const useAppsStore = create<AppsState>((set, get) => ({
               ...app,
               open: !app.open,
               lastOpened: !app.open ? true : app.lastOpened,
+              minimized: false,
             }
           : app
+      ),
+    })),
+
+  minimizeApp: (id) =>
+    set((state) => ({
+      apps: state.apps.map((app) =>
+        app.id === id ? { ...app, minimized: true } : app
+      ),
+    })),
+
+  restoreApp: (id) =>
+    set((state) => ({
+      apps: state.apps.map((app) =>
+        app.id === id ? { ...app, minimized: false } : app
+      ),
+    })),
+
+  toggleMinimize: (id) =>
+    set((state) => ({
+      apps: state.apps.map((app) =>
+        app.id === id ? { ...app, minimized: !app.minimized } : app
       ),
     })),
 

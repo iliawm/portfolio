@@ -200,6 +200,10 @@ const Apps = ({
               setSelectedAppIds([app.id]);
               handle_clicks();
             }}
+            onContextMenu={(e)=>{
+              e.stopPropagation()
+              e.preventDefault()
+            }}
             onDoubleClick={() => {
               handle_double_clicks(app.id);
             }}
