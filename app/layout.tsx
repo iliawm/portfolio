@@ -45,7 +45,7 @@ export default function RootLayout({
             </div>
         </div>
         {/* main code */}
-                <ThemeProvider attribute="class" defaultTheme="system" enableSystem >
+                <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
         {children}
         <TaskBar />
         </ThemeProvider>

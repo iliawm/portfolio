@@ -255,8 +255,8 @@ export default function WindowFrame({
         </div>
       </div>
 
-      <div className="hide-scrollbar min-h-0 flex-1 overflow-auto p-3 text-sm text-white">
-        {children}
+      <div className="hide-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3 text-sm text-white">
+      {children}
       </div>
 
       {!maximized && (

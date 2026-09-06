@@ -34,9 +34,6 @@ const TaskBar = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    setTheme("dark");
-  }, [menuIndex, setTheme]);
 
   useEffect(() => {
     if (Mode === 4) return;
