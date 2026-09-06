@@ -13,20 +13,34 @@ export default function WindowFrame({
   onClose,
   onMinimize,
   minimized,
+  defaultWidth = 640,
+  defaultHeight = 420,
   children,
 }: {
   title: string;
   onClose: () => void;
   onMinimize: () => void;
   minimized?: boolean;
+  defaultWidth?: number;
+  defaultHeight?: number;
   children: React.ReactNode;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [z, setZ] = useState(40);
   const [maximized, setMaximized] = useState(false);
 
-  const pos = useRef({ x: 140, y: 100, w: 640, h: 420 });
-  const preMax = useRef({ x: 140, y: 100, w: 640, h: 420 });
+  const pos = useRef({
+    x: 100,
+    y: 60,
+    w: defaultWidth,
+    h: defaultHeight,
+  });
+  const preMax = useRef({
+    x: 100,
+    y: 60,
+    w: defaultWidth,
+    h: defaultHeight,
+  });
 
   const drag = useRef<{
     startX: number;
@@ -184,15 +198,15 @@ export default function WindowFrame({
         setZ((v) => v + 1);
       }}
       onClick={(e) => e.stopPropagation()}
-      onContextMenu={(e)=>{
-        e.stopPropagation()
-        e.preventDefault()
+      onContextMenu={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
       }}
     >
       <div
         onPointerDown={startDrag}
         onDoubleClick={toggleMaximize}
-        className="flex h-9 shrink-0 cursor-grab items-center justify-between bg-white/5 px-2 active:cursor-grabbing  "
+        className="flex h-9 shrink-0 cursor-grab items-center justify-between bg-white/5 px-2 active:cursor-grabbing"
       >
         <span className="select-none truncate px-1 text-xs text-white/80">
           {title}
@@ -221,9 +235,9 @@ export default function WindowFrame({
             className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-white/10"
           >
             {maximized ? (
-              <span className="text-[15px]  h-fit leading-none">❐</span>
+              <span className="h-fit text-[15px] leading-none">❐</span>
             ) : (
-              <span className="text-[20px] mb-1 h-fit leading-none">☐</span>
+              <span className="mb-1 h-fit text-[20px] leading-none">☐</span>
             )}
           </button>
           <button
@@ -241,7 +255,7 @@ export default function WindowFrame({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto p-3 text-sm text-white hide-scrollbar">
+      <div className="hide-scrollbar min-h-0 flex-1 overflow-auto p-3 text-sm text-white">
         {children}
       </div>
 
