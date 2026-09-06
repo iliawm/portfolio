@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-
+import { useTheme } from "next-themes";
 type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
 const MIN_W = 320;
@@ -29,6 +29,9 @@ export default function WindowFrame({
   const [z, setZ] = useState(40);
   const [maximized, setMaximized] = useState(false);
 
+
+const { resolvedTheme } = useTheme();
+const isDark = resolvedTheme !== "light";
   const pos = useRef({
     x: 100,
     y: 60,
@@ -184,7 +187,11 @@ export default function WindowFrame({
   return (
     <div
       ref={frameRef}
-      className="fixed flex flex-col overflow-hidden border border-white/10 bg-[#1e1e1e]/95 shadow-2xl backdrop-blur-xl"
+      className={`fixed flex flex-col overflow-hidden border shadow-2xl backdrop-blur-xl ${
+      isDark
+        ? "border-white/10 bg-[#1e1e1e]/95 text-white"
+        : "border-black/10 bg-[#f3f3f3]/95 text-neutral-900"
+    }`}
       style={{
         left: pos.current.x,
         top: pos.current.y,
@@ -208,7 +215,9 @@ export default function WindowFrame({
         onDoubleClick={toggleMaximize}
         className="flex h-9 shrink-0 cursor-grab items-center justify-between bg-white/5 px-2 active:cursor-grabbing"
       >
-        <span className="select-none truncate px-1 text-xs text-white/80">
+        <span className={`select-none truncate px-1 text-xs ${
+        isDark ? "text-white/80" : "text-neutral-700"
+        }`}>
           {title}
         </span>
         <div className="flex items-center gap-0.5">
@@ -220,7 +229,9 @@ export default function WindowFrame({
               onMinimize();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-white/10"
+            className={`flex h-7 w-10 items-center justify-center rounded-sm ${
+            isDark ? "text-white/70 hover:bg-white/10" : "text-neutral-600 hover:bg-black/5"
+          }`}
           >
             <span className="mb-1 text-lg leading-none">─</span>
           </button>
@@ -232,7 +243,9 @@ export default function WindowFrame({
               toggleMaximize();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-white/10"
+            className={`flex h-7 w-10 items-center justify-center rounded-sm ${
+            isDark ? "text-white/70 hover:bg-white/10" : "text-neutral-600 hover:bg-black/5"
+          }`}
           >
             {maximized ? (
               <span className="h-fit text-[15px] leading-none">❐</span>
@@ -248,14 +261,14 @@ export default function WindowFrame({
               onClose();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-red-500 hover:text-white"
+           className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-red-500 hover:text-white"
           >
             ✕
           </button>
         </div>
       </div>
 
-      <div className="hide-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3 text-sm text-white">
+      <div className="hide-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3 text-sm">
       {children}
       </div>
 

@@ -3,7 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { useAppsStore } from "@/store/useAppsStore";
+import ContextMenu, {
+  clampMenuPosition,
+  type ContextItem,
+} from "../ContextMenu";
 
 interface AppsProps {
   gridSize: number;
@@ -18,6 +23,9 @@ const Apps = ({
   clicked,
   isAppDraggingRef,
 }: AppsProps) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
+
   const apps = useAppsStore((s) => s.apps);
   const selectedAppIds = useAppsStore((s) => s.selectedAppIds);
   const setSelectedAppIds = useAppsStore((s) => s.setSelectedAppIds);
@@ -28,10 +36,16 @@ const Apps = ({
   );
 
   const [lastClick, setLastClick] = useState(0);
+  const [iconMenu, setIconMenu] = useState<{
+    x: number;
+    y: number;
+    appId: string;
+  } | null>(null);
 
   useEffect(() => {
     if (clicked === true) {
       setSelectedAppIds([]);
+      setIconMenu(null);
     }
   }, [clicked, setSelectedAppIds]);
 
@@ -46,6 +60,21 @@ const Apps = ({
     }
   };
 
+  const iconMenuItems = (appId: string): ContextItem[] => [
+    {
+      label: "Open",
+      onClick: () => openApp(appId),
+      dividerAfter: true,
+    },
+    { label: "Pin to Start", disabled: true },
+    { label: "Pin to taskbar", disabled: true, dividerAfter: true },
+    { label: "Delete", danger: true, disabled: true, dividerAfter: true },
+    {
+      label: "Properties",
+      onClick: () => openApp(appId),
+    },
+  ];
+
   return (
     <>
       {apps.map((app, index) => {
@@ -57,8 +86,14 @@ const Apps = ({
           <motion.div
             key={app.id || index}
             className={`absolute hidden cursor-pointer select-none md:flex ${
-              active ? "bg-white/20 outline  outline-white/40" : ""
-            } flex-col items-center justify-start rounded-md hover:bg-white/10 active:scale-95`}
+              active
+                ? isDark
+                  ? "bg-white/20 outline outline-white/40"
+                  : "bg-black/10 outline outline-black/20"
+                : ""
+            } flex-col items-center justify-start rounded-md ${
+              isDark ? "hover:bg-white/10" : "hover:bg-black/5"
+            } active:scale-95`}
             style={{
               width: `${gridSize}px`,
               height: `${gridSize}px`,
@@ -75,6 +110,7 @@ const Apps = ({
             }}
             onDragStart={() => {
               isAppDraggingRef.current = true;
+              setIconMenu(null);
             }}
             animate={{
               x: app.defaultCol * gridSize,
@@ -198,17 +234,20 @@ const Apps = ({
             onClick={(e) => {
               e.stopPropagation();
               setSelectedAppIds([app.id]);
+              setIconMenu(null);
               handle_clicks();
             }}
-            onContextMenu={(e)=>{
-              e.stopPropagation()
-              e.preventDefault()
+            onContextMenu={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const pos = clampMenuPosition(e.clientX, e.clientY);
+              setSelectedAppIds([app.id]);
+              setIconMenu({ ...pos, appId: app.id });
             }}
             onDoubleClick={() => {
               handle_double_clicks(app.id);
             }}
           >
-            
             <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center">
               {app.isIconpath ? (
                 <Image
@@ -228,10 +267,13 @@ const Apps = ({
             </div>
 
             <span
-              className="mt-1 line-clamp-2 w-18 px-0.5 text-center text-[11px] leading-[1.15] font-medium text-white"
+              className={`mt-1 line-clamp-2 w-18 px-0.5 text-center text-xs leading-tight font-medium ${
+                isDark ? "text-white" : "text-neutral-900"
+              }`}
               style={{
-                textShadow:
-                  "0 0 2px #000, 0 0 2px #000, 1px 1px 1px #000, -1px -1px 1px #000",
+                textShadow: isDark
+                  ? "0 0 2px #000, 0 0 2px #000, 1px 1px 1px #000, -1px -1px 1px #000"
+                  : "0 0 2px #fff, 0 0 2px #fff, 1px 1px 1px #fff, -1px -1px 1px #fff",
               }}
             >
               {app.name}
@@ -239,6 +281,15 @@ const Apps = ({
           </motion.div>
         );
       })}
+
+      {iconMenu && (
+        <ContextMenu
+          x={iconMenu.x}
+          y={iconMenu.y}
+          items={iconMenuItems(iconMenu.appId)}
+          onClose={() => setIconMenu(null)}
+        />
+      )}
     </>
   );
 };
