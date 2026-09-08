@@ -208,6 +208,11 @@ const TaskBar = () => {
               if (app.minimized) restoreApp(app.id);
               else toggleMinimize(app.id);
             }}
+            onContextMenu={(e)=>{
+              e.stopPropagation()
+              e.preventDefault()
+              
+            }}
             className={`relative flex h-full w-12 items-center justify-center rounded-lg transition-all hover:scale-[1.08] active:scale-100 ${
               isDark ? "hover:bg-gray-600" : "hover:bg-gray-200"
             } ${app.minimized ? "bg-white/5 opacity-70" : "bg-white/10"}`}

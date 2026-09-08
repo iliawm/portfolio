@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
+import { useAppsStore } from "@/store/useAppsStore";
+
 type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
 const MIN_W = 320;
@@ -9,6 +11,7 @@ const MIN_H = 200;
 const TASKBAR_H = 60;
 
 export default function WindowFrame({
+  appId,
   title,
   onClose,
   onMinimize,
@@ -17,6 +20,7 @@ export default function WindowFrame({
   defaultHeight = 420,
   children,
 }: {
+  appId?: string;
   title: string;
   onClose: () => void;
   onMinimize: () => void;
@@ -26,12 +30,16 @@ export default function WindowFrame({
   children: React.ReactNode;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
-  const [z, setZ] = useState(40);
   const [maximized, setMaximized] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
 
+  const focusApp = useAppsStore((s) => s.focusApp);
+  const zIndex = useAppsStore((s) => {
+    if (!appId) return 30;
+    return s.apps.find((a) => a.id === appId)?.zIndex ?? 30;
+  });
 
-const { resolvedTheme } = useTheme();
-const isDark = resolvedTheme !== "light";
   const pos = useRef({
     x: 100,
     y: 60,
@@ -76,6 +84,10 @@ const isDark = resolvedTheme !== "light";
     apply();
   }, [apply]);
 
+  const bringFront = () => {
+    if (appId) focusApp(appId);
+  };
+
   const onMove = useCallback(
     (e: PointerEvent) => {
       if (drag.current && !maximized) {
@@ -96,16 +108,12 @@ const isDark = resolvedTheme !== "light";
         let w = r.origW;
         let h = r.origH;
 
-        if (r.dir.includes("e")) {
-          w = Math.max(MIN_W, r.origW + dx);
-        }
+        if (r.dir.includes("e")) w = Math.max(MIN_W, r.origW + dx);
         if (r.dir.includes("w")) {
           w = Math.max(MIN_W, r.origW - dx);
           x = r.origX + (r.origW - w);
         }
-        if (r.dir.includes("s")) {
-          h = Math.max(MIN_H, r.origH + dy);
-        }
+        if (r.dir.includes("s")) h = Math.max(MIN_H, r.origH + dy);
         if (r.dir.includes("n")) {
           h = Math.max(MIN_H, r.origH - dy);
           y = r.origY + (r.origH - h);
@@ -126,6 +134,7 @@ const isDark = resolvedTheme !== "light";
   }, [onMove]);
 
   const startDrag = (e: React.PointerEvent) => {
+    bringFront();
     if (maximized) return;
     e.preventDefault();
     e.stopPropagation();
@@ -140,6 +149,7 @@ const isDark = resolvedTheme !== "light";
   };
 
   const startResize = (dir: ResizeDir, e: React.PointerEvent) => {
+    bringFront();
     if (maximized) return;
     e.preventDefault();
     e.stopPropagation();
@@ -157,6 +167,7 @@ const isDark = resolvedTheme !== "light";
   };
 
   const toggleMaximize = () => {
+    bringFront();
     if (!maximized) {
       preMax.current = { ...pos.current };
       pos.current = {
@@ -182,27 +193,27 @@ const isDark = resolvedTheme !== "light";
 
   if (minimized) return null;
 
-  const handle = "absolute z-50";
+  const handle = "absolute z-10";
 
   return (
     <div
       ref={frameRef}
       className={`fixed flex flex-col overflow-hidden border shadow-2xl backdrop-blur-xl ${
-      isDark
-        ? "border-white/10 bg-[#1e1e1e]/95 text-white"
-        : "border-black/10 bg-[#f3f3f3]/95 text-neutral-900"
-    }`}
+        isDark
+          ? "border-white/10 bg-[#1e1e1e]/95 text-white"
+          : "border-black/10 bg-[#f3f3f3]/95 text-neutral-900"
+      }`}
       style={{
         left: pos.current.x,
         top: pos.current.y,
         width: pos.current.w,
         height: pos.current.h,
-        zIndex: z,
+        zIndex,
         borderRadius: maximized ? 0 : 8,
       }}
       onMouseDown={(e) => {
         e.stopPropagation();
-        setZ((v) => v + 1);
+        bringFront();
       }}
       onClick={(e) => e.stopPropagation()}
       onContextMenu={(e) => {
@@ -213,11 +224,15 @@ const isDark = resolvedTheme !== "light";
       <div
         onPointerDown={startDrag}
         onDoubleClick={toggleMaximize}
-        className="flex h-9 shrink-0 cursor-grab items-center justify-between bg-white/5 px-2 active:cursor-grabbing"
+        className={`flex h-9 shrink-0 cursor-grab items-center justify-between px-2 active:cursor-grabbing ${
+          isDark ? "bg-white/5" : "bg-black/5"
+        }`}
       >
-        <span className={`select-none truncate px-1 text-xs ${
-        isDark ? "text-white/80" : "text-neutral-700"
-        }`}>
+        <span
+          className={`select-none truncate px-1 text-xs ${
+            isDark ? "text-white/80" : "text-neutral-700"
+          }`}
+        >
           {title}
         </span>
         <div className="flex items-center gap-0.5">
@@ -230,8 +245,10 @@ const isDark = resolvedTheme !== "light";
             }}
             onPointerDown={(e) => e.stopPropagation()}
             className={`flex h-7 w-10 items-center justify-center rounded-sm ${
-            isDark ? "text-white/70 hover:bg-white/10" : "text-neutral-600 hover:bg-black/5"
-          }`}
+              isDark
+                ? "text-white/70 hover:bg-white/10"
+                : "text-neutral-600 hover:bg-black/5"
+            }`}
           >
             <span className="mb-1 text-lg leading-none">─</span>
           </button>
@@ -244,8 +261,10 @@ const isDark = resolvedTheme !== "light";
             }}
             onPointerDown={(e) => e.stopPropagation()}
             className={`flex h-7 w-10 items-center justify-center rounded-sm ${
-            isDark ? "text-white/70 hover:bg-white/10" : "text-neutral-600 hover:bg-black/5"
-          }`}
+              isDark
+                ? "text-white/70 hover:bg-white/10"
+                : "text-neutral-600 hover:bg-black/5"
+            }`}
           >
             {maximized ? (
               <span className="h-fit text-[15px] leading-none">❐</span>
@@ -261,7 +280,7 @@ const isDark = resolvedTheme !== "light";
               onClose();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-           className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-red-500 hover:text-white"
+            className="flex h-7 w-10 items-center justify-center rounded-sm text-white/70 hover:bg-red-500 hover:text-white"
           >
             ✕
           </button>
@@ -269,7 +288,7 @@ const isDark = resolvedTheme !== "light";
       </div>
 
       <div className="hide-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-3 text-sm">
-      {children}
+        {children}
       </div>
 
       {!maximized && (

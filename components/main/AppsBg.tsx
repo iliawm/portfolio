@@ -5,7 +5,10 @@ import { useTheme } from "next-themes";
 import Apps from "./Apps/Apps";
 import { useAppsStore } from "@/store/useAppsStore";
 import WindowManager from "./Windows/WindowManager";
-import ContextMenu, { clampMenuPosition, type ContextItem } from "./ContextMenu";
+import ContextMenu, {
+  clampMenuPosition,
+  type ContextItem,
+} from "./ContextMenu";
 
 const AppsBg = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,8 +20,12 @@ const AppsBg = () => {
   const isDark = resolvedTheme !== "light";
 
   const apps = useAppsStore((s) => s.apps);
+  const folders = useAppsStore((s) => s.folders);
   const setSelectedAppIds = useAppsStore((s) => s.setSelectedAppIds);
   const openApp = useAppsStore((s) => s.openApp);
+  const createFolder = useAppsStore((s) => s.createFolder);
+  const clipboard = useAppsStore((s) => s.clipboard);
+  const pasteClipboard = useAppsStore((s) => s.pasteClipboard);
 
   const [Clicked, setClicked] = useState(false);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -29,6 +36,8 @@ const AppsBg = () => {
     currentX: 0,
     currentY: 0,
   });
+  const [folderDialog, setFolderDialog] = useState(false);
+  const [folderName, setFolderName] = useState("New folder");
 
   useEffect(() => {
     if (Clicked) setMenu(null);
@@ -37,19 +46,60 @@ const AppsBg = () => {
   const desktopItems: ContextItem[] = [
     { label: "View", hint: "›" },
     { label: "Sort by", hint: "›", dividerAfter: true },
-    { label: "Refresh", onClick: () => window.location.reload(), dividerAfter: true },
-    { label: "Paste", disabled: true },
-    { label: "Paste shortcut", disabled: true, dividerAfter: true },
-    { label: "New", hint: "›", dividerAfter: true },
-    { label: "Display settings", onClick: () => openApp("settings") },
-    { label: "Personalize", onClick: () => openApp("settings") },
+    {
+      label: "Refresh",
+      onClick: () => window.location.reload(),
+      dividerAfter: true,
+    },
+    {
+      label: "Paste",
+      disabled: !clipboard,
+      onClick: () => {
+        pasteClipboard({ folderId: null, driveId: "c" });
+      },
+    },
+    {
+      label: "Paste shortcut",
+      disabled: true,
+      dividerAfter: true,
+    },
+    {
+      label: "New",
+      hint: "›",
+      dividerAfter: true,
+      children: [
+        {
+          label: "Folder",
+          onClick: () => {
+            setFolderName("New folder");
+            setFolderDialog(true);
+          },
+        },
+        {
+          label: "Shortcut",
+          disabled: true,
+        },
+        {
+          label: "Text Document",
+          disabled: true,
+        },
+      ],
+    },
+    {
+      label: "Display settings",
+      onClick: () => openApp("settings"),
+    },
+    {
+      label: "Personalize",
+      onClick: () => openApp("settings"),
+    },
   ];
 
   const handle_contextmenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.target !== containerRef.current) return;
-    const pos = clampMenuPosition(e.clientX, e.clientY);
+    const pos = clampMenuPosition(e.clientX, e.clientY, 220, 320);
     setMenu(pos);
   };
 
@@ -113,6 +163,17 @@ const AppsBg = () => {
     if (isSelecting) setIsSelecting(false);
   };
 
+  const confirmNewFolder = () => {
+    createFolder({
+      name: folderName.trim() || "New folder",
+      driveId: "c",
+      parentId: null,
+      isOnDesktop: true,
+    });
+    setFolderDialog(false);
+    setMenu(null);
+  };
+
   const boxLeft = Math.min(selectionBox.startX, selectionBox.currentX);
   const boxTop = Math.min(selectionBox.startY, selectionBox.currentY);
   const boxWidth = Math.abs(selectionBox.currentX - selectionBox.startX);
@@ -143,6 +204,60 @@ const AppsBg = () => {
           items={desktopItems}
           onClose={() => setMenu(null)}
         />
+      )}
+
+      {folderDialog && (
+        <div
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setFolderDialog(false)}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <div
+            className={`w-full max-w-sm rounded-xl border p-4 shadow-2xl ${
+              isDark
+                ? "border-white/10 bg-[#2c2c2c] text-white"
+                : "border-black/10 bg-white text-neutral-900"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="mb-3 text-sm font-semibold">New folder</h3>
+            <input
+              autoFocus
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmNewFolder();
+                if (e.key === "Escape") setFolderDialog(false);
+              }}
+              className={`mb-4 w-full rounded-md px-3 py-2 text-sm outline-none ring-1 ${
+                isDark
+                  ? "bg-[#1c1c1c] ring-white/10"
+                  : "bg-black/5 ring-black/10"
+              }`}
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setFolderDialog(false)}
+                className={`rounded-md px-3 py-1.5 text-xs ${
+                  isDark ? "hover:bg-white/10" : "hover:bg-black/5"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmNewFolder}
+                className="rounded-md bg-[#0078d4] px-3 py-1.5 text-xs text-white hover:bg-[#006cbd]"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {isSelecting && (
