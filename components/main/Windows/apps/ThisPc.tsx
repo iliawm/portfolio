@@ -837,7 +837,7 @@ export default function ThisPc({
           </button>
 
           <div
-            className={`order-last mt-1 flex min-w-0 w-full flex-1 items-center gap-1 rounded-md px-2 py-1 text-xs ring-1 sm:order-none sm:mt-0 sm:w-auto ${inputCls}`}
+            className={`order-last mt-1 flex min-w-0 w-full flex-1 items-center gap-1 rounded-md px-2 py-1 text-xs ring-1 sm:order-0 sm:mt-0 sm:w-auto ${inputCls}`}
           >
             <IoHomeOutline className={muted} />
             <IoChevronForward className={`text-[10px] ${muted}`} />
