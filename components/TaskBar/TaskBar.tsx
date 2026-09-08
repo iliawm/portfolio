@@ -9,6 +9,7 @@ import { useTheme } from "next-themes";
 import { FaCheck } from "react-icons/fa6";
 import SystemTray from "./Menu/SystemTray";
 import { useAppsStore } from "@/store/useAppsStore";
+import Apps from "../main/Apps/Apps";
 
 const TaskBar = () => {
   const [Menu, SetMenu] = useState(false);
@@ -22,7 +23,9 @@ const TaskBar = () => {
 
   const apps = useAppsStore((s) => s.apps);
   const openApps = apps.filter((app) => app.open);
+  const pinnedApps = apps.filter((app)=>app.ispinnedtoTaskbar)
   const restoreApp = useAppsStore((s) => s.restoreApp);
+  const openApp= useAppsStore((s) => s.openApp);
   const toggleMinimize = useAppsStore((s) => s.toggleMinimize);
 
   useEffect(() => {
@@ -241,6 +244,51 @@ const TaskBar = () => {
             />
           </button>
         ))}
+        {pinnedApps.map((app) => {
+          if(app.open) return null
+          return(
+          <button
+            key={app.id}
+            type="button"
+            title={app.name}
+            onClick={() => {
+              openApp(app.id)
+              
+            }}
+            onContextMenu={(e)=>{
+              e.stopPropagation()
+              e.preventDefault()
+              
+            }}
+            className={`relative flex h-full w-12 items-center justify-center rounded-lg transition-all hover:scale-[1.08] active:scale-100 ${
+              isDark ? "hover:bg-gray-600" : "hover:bg-gray-200"
+            } ${app.minimized ? "bg-white/5 opacity-70" : "bg-white/10"}`}
+          >
+            {!app.isIconpath ? (
+              <span className="text-xl leading-none">{app.icon}</span>
+            ) : (
+              <Image
+                src={app.icon}
+                width={28}
+                height={28}
+                alt={app.id}
+                className="h-7 w-7 object-contain"
+              />
+            )}
+            <span
+              className={`absolute bottom-1 left-1/2 h-0.75 w-4 -translate-x-1/2 rounded-full ${
+                app.open?
+                app.minimized
+                  ? isDark
+                    ? "bg-white/40"
+                    : "bg-black/30"
+                  : isDark
+                    ? "bg-white/80"
+                    : "bg-black/60"
+              :""}`}
+            />
+          </button>)
+        })}
       </div>
 
       <div

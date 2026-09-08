@@ -45,7 +45,8 @@ const Apps = ({
   const addAppToFolder = useAppsStore((s) => s.addAppToFolder);
   const openFolderInExplorer = useAppsStore((s) => s.openFolderInExplorer);
   const setExplorerDrag = useAppsStore((s) => s.setExplorerDrag);
-
+  const TaskPinapps = useAppsStore((s)=>s.togglePinTaskbar)
+  const StartPins = useAppsStore((s)=>s.togglePinStart)
   const [lastClick, setLastClick] = useState(0);
   const [iconMenu, setIconMenu] = useState<{
     x: number;
@@ -116,8 +117,6 @@ const Apps = ({
     );
 
   const resolveExplorerDrop = (clientX: number, clientY: number) => {
-    // Disable pointer events only on desktop icons so elementFromPoint
-    // can hit This PC / explorer drop targets underneath the dragged icon.
     const icons = document.querySelectorAll<HTMLElement>("[data-desktop-icon]");
     icons.forEach((el) => {
       el.style.pointerEvents = "none";
@@ -164,8 +163,19 @@ const Apps = ({
         disabled: !clipboard,
         dividerAfter: true,
       },
-      { label: "Pin to Start", disabled: true },
-      { label: "Pin to taskbar", disabled: true, dividerAfter: true },
+      { label: "Pin to Start",
+        disabled: false,
+        onClick:()=>{
+          StartPins(appId)
+        }
+        },
+      { label: "Pin to taskbar", disabled: false,
+         dividerAfter: true ,
+        onClick:()=>{
+          TaskPinapps(appId)
+          
+        }
+      },
       {
         label: "Delete",
         danger: true,
