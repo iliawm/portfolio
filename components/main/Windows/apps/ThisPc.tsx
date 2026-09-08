@@ -134,13 +134,13 @@ export default function ThisPc({
   const deleteFolder = useAppsStore((s) => s.deleteFolder);
   const setFolderOnDesktop = useAppsStore((s) => s.setFolderOnDesktop);
   const removeAppFromFolder = useAppsStore((s) => s.removeAppFromFolder);
-  const moveAppToFolder = useAppsStore((s) => s.moveAppToFolder);
   const addAppToFolder = useAppsStore((s) => s.addAppToFolder);
   const pasteClipboard = useAppsStore((s) => s.pasteClipboard);
   const explorerPath = useAppsStore((s) => s.explorerPath);
   const setExplorerPath = useAppsStore((s) => s.setExplorerPath);
   const pinnedDrives = useAppsStore((s) => s.pinnedDrives);
   const togglePinDrive = useAppsStore((s) => s.togglePinDrive);
+  const setExplorerDrag = useAppsStore((s) => s.setExplorerDrag);
 
   const [tabs, setTabs] = useState<Tab[]>([
     { id: "tab-1", path: "this-pc", title: "This PC" },
@@ -239,25 +239,25 @@ export default function ThisPc({
   const title = titleForPath(nav, folders);
   const q = query.trim().toLowerCase();
 
-  const byName = <T extends { name: string }>(list: T[]) =>
+  const sortByName = <T extends { name: string }>(list: T[]) =>
     [...list].sort((a, b) => a.name.localeCompare(b.name));
 
-  const desktopApps = byName(
+  const desktopApps = sortByName(
     apps.filter(
       (a) => a.isOnDesktop && (!q || a.name.toLowerCase().includes(q))
     )
   );
-  const allApps = byName(
+  const allApps = sortByName(
     apps.filter((a) => !q || a.name.toLowerCase().includes(q))
   );
-  const folderApps = byName(
+  const folderAppsList = sortByName(
     apps.filter(
       (a) =>
         !!activeFolder?.appIds.includes(a.id) &&
         (!q || a.name.toLowerCase().includes(q))
     )
   );
-  const foldersInView = byName(
+  const foldersInViewList = sortByName(
     folders.filter((f) => {
       if (nav === "drive:c") return f.driveId === "c" && f.parentId === null;
       if (nav === "drive:d") return f.driveId === "d" && f.parentId === null;
@@ -270,14 +270,31 @@ export default function ThisPc({
     })
   );
 
+  const mixedItems = useMemo(() => {
+    const folderItems = foldersInViewList.map((f) => ({
+      kind: "folder" as const,
+      f,
+      name: f.name,
+    }));
+    const appItems = (activeFolder ? folderAppsList : []).map((a) => ({
+      kind: "app" as const,
+      a,
+      name: a.name,
+    }));
+    if (sortKey === "type") {
+      return [...folderItems, ...appItems];
+    }
+    return [...folderItems, ...appItems].sort((x, y) =>
+      x.name.localeCompare(y.name)
+    );
+  }, [foldersInViewList, folderAppsList, activeFolder, sortKey]);
+
   const sortedCategories = useMemo(() => {
     const list = CATEGORIES.filter(
       (c) => !q || c.label.toLowerCase().includes(q)
     );
-    return sortKey === "name"
-      ? [...list].sort((a, b) => a.label.localeCompare(b.label))
-      : list;
-  }, [q, sortKey]);
+    return [...list].sort((a, b) => a.label.localeCompare(b.label));
+  }, [q]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -294,16 +311,6 @@ export default function ThisPc({
     if (nav === "drive:d") return { folderId: null, driveId: "d" as const };
     if (nav === "desktop") return { folderId: null, driveId: "c" as const };
     return null;
-  };
-
-  const placeAppInCurrentFolder = (appId: string) => {
-    if (!activeFolderId) return;
-    moveAppToFolder(appId, activeFolderId, {
-      fromFolderId: null,
-      removeFromDesktop: true,
-    });
-    addAppToFolder(activeFolderId, appId);
-    setOnDesktop(appId, false);
   };
 
   const moveToDesktop = (appId: string) => {
@@ -378,6 +385,7 @@ export default function ThisPc({
     }
     setDragItem(null);
     setDropTarget(null);
+    setExplorerDrag(null);
   };
 
   const handleDropOnCurrentView = () => {
@@ -395,7 +403,10 @@ export default function ThisPc({
       }
     } else if (activeFolderId) {
       if (dragItem.type === "app") {
-        placeAppInCurrentFolder(dragItem.id);
+        if (activeFolderId) {
+          addAppToFolder(activeFolderId, dragItem.id);
+          setOnDesktop(dragItem.id, false);
+        }
         showToast("Added to folder");
       }
       if (dragItem.type === "folder" && dragItem.id !== activeFolderId) {
@@ -416,6 +427,7 @@ export default function ThisPc({
 
     setDragItem(null);
     setDropTarget(null);
+    setExplorerDrag(null);
   };
 
   const emptyItems = (): ContextItem[] => {
@@ -642,15 +654,13 @@ export default function ThisPc({
       onDragStart={(e) => {
         e.stopPropagation();
         setDragItem({ type: "app", id: app.id });
-        e.dataTransfer.setData(
-          "application/x-portfolio-app",
-          JSON.stringify({ type: "app", id: app.id })
-        );
+        setExplorerDrag({ type: "app", id: app.id, source: "explorer" });
         e.dataTransfer.effectAllowed = "move";
       }}
       onDragEnd={() => {
         setDragItem(null);
         setDropTarget(null);
+        setExplorerDrag(null);
       }}
       onDoubleClick={() => openApp(app.id)}
       onClick={() => {
@@ -691,15 +701,13 @@ export default function ThisPc({
       onDragStart={(e) => {
         e.stopPropagation();
         setDragItem({ type: "folder", id: f.id });
-        e.dataTransfer.setData(
-          "application/x-portfolio-app",
-          JSON.stringify({ type: "folder", id: f.id })
-        );
+        setExplorerDrag({ type: "folder", id: f.id, source: "explorer" });
         e.dataTransfer.effectAllowed = "move";
       }}
       onDragEnd={() => {
         setDragItem(null);
         setDropTarget(null);
+        setExplorerDrag(null);
       }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -906,6 +914,7 @@ export default function ThisPc({
                   }
                   setDragItem(null);
                   setDropTarget(null);
+                  setExplorerDrag(null);
                 }}
                 className={`${sideBtn(nav === item.id)} ${
                   dropTarget === "desktop" && item.id === "desktop"
@@ -999,6 +1008,7 @@ export default function ThisPc({
                     ))}
                   </div>
                 </section>
+
                 <section>
                   <h2 className={`mb-2 text-xs font-semibold ${muted}`}>
                     Devices and drives
@@ -1006,6 +1016,7 @@ export default function ThisPc({
                   <div className="flex flex-col gap-2">
                     {DRIVES.map((d) => {
                       const pct = Math.round((d.used / d.total) * 100);
+                      const pinned = pinnedDrives.includes(d.id);
                       return (
                         <button
                           key={d.id}
@@ -1029,8 +1040,13 @@ export default function ThisPc({
                             <IoHardwareChipOutline />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="truncate text-sm font-medium">
-                              {d.label}
+                            <div className="flex items-center gap-2">
+                              <span className="truncate text-sm font-medium">
+                                {d.label}
+                              </span>
+                              {pinned && (
+                                <IoPinOutline className={`text-xs ${muted}`} />
+                              )}
                             </div>
                             <div className={`text-xs ${muted}`}>{d.sub}</div>
                             <div
@@ -1070,18 +1086,20 @@ export default function ThisPc({
                   </button>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {foldersInView.map(renderFolderButton)}
-                  {activeFolder && folderApps.map(renderAppButton)}
-                  {foldersInView.length === 0 &&
-                    (!activeFolder || folderApps.length === 0) && (
-                      <div
-                        className={`col-span-full rounded-lg border border-dashed py-10 text-center text-sm ${muted} ${
-                          isDark ? "border-white/15" : "border-black/15"
-                        }`}
-                      >
-                        Drop apps here or right-click → New folder
-                      </div>
-                    )}
+                  {mixedItems.map((item) =>
+                    item.kind === "folder"
+                      ? renderFolderButton(item.f)
+                      : renderAppButton(item.a)
+                  )}
+                  {mixedItems.length === 0 && (
+                    <div
+                      className={`col-span-full rounded-lg border border-dashed py-10 text-center text-sm ${muted} ${
+                        isDark ? "border-white/15" : "border-black/15"
+                      }`}
+                    >
+                      Drop apps here or right-click → New folder
+                    </div>
+                  )}
                 </div>
               </div>
             )}

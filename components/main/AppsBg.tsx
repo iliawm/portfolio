@@ -20,12 +20,14 @@ const AppsBg = () => {
   const isDark = resolvedTheme !== "light";
 
   const apps = useAppsStore((s) => s.apps);
-  const folders = useAppsStore((s) => s.folders);
   const setSelectedAppIds = useAppsStore((s) => s.setSelectedAppIds);
   const openApp = useAppsStore((s) => s.openApp);
   const createFolder = useAppsStore((s) => s.createFolder);
   const clipboard = useAppsStore((s) => s.clipboard);
   const pasteClipboard = useAppsStore((s) => s.pasteClipboard);
+  const setOnDesktop = useAppsStore((s) => s.setOnDesktop);
+  const setFolderOnDesktop = useAppsStore((s) => s.setFolderOnDesktop);
+  const setExplorerDrag = useAppsStore((s) => s.setExplorerDrag);
 
   const [Clicked, setClicked] = useState(false);
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
@@ -75,14 +77,8 @@ const AppsBg = () => {
             setFolderDialog(true);
           },
         },
-        {
-          label: "Shortcut",
-          disabled: true,
-        },
-        {
-          label: "Text Document",
-          disabled: true,
-        },
+        { label: "Shortcut", disabled: true },
+        { label: "Text Document", disabled: true },
       ],
     },
     {
@@ -183,11 +179,26 @@ const AppsBg = () => {
     <div
       className="absolute inset-0 z-20 flex h-screen w-full select-none overflow-hidden"
       ref={containerRef}
+      data-explorer-drop="desktop"
       onContextMenu={handle_contextmenu}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onClick={handle_Deselection}
+      onDragOver={(e) => {
+        if (e.target !== containerRef.current) return;
+        const drag = useAppsStore.getState().explorerDrag;
+        if (drag?.source === "explorer") e.preventDefault();
+      }}
+      onDrop={(e) => {
+        if (e.target !== containerRef.current) return;
+        e.preventDefault();
+        const drag = useAppsStore.getState().explorerDrag;
+        if (!drag || drag.source !== "explorer") return;
+        if (drag.type === "app") setOnDesktop(drag.id, true);
+        if (drag.type === "folder") setFolderOnDesktop(drag.id, true);
+        setExplorerDrag(null);
+      }}
     >
       <Apps
         gridSize={gridSize}

@@ -44,6 +44,7 @@ const Apps = ({
   const clipboard = useAppsStore((s) => s.clipboard);
   const addAppToFolder = useAppsStore((s) => s.addAppToFolder);
   const openFolderInExplorer = useAppsStore((s) => s.openFolderInExplorer);
+  const setExplorerDrag = useAppsStore((s) => s.setExplorerDrag);
 
   const [lastClick, setLastClick] = useState(0);
   const [iconMenu, setIconMenu] = useState<{
@@ -107,6 +108,15 @@ const Apps = ({
     desktopFolders.some(
       (f) => (f.defaultCol ?? 0) === c && (f.defaultRow ?? 0) === r
     );
+
+  const resolveExplorerDrop = (clientX: number, clientY: number) => {
+    const prev = document.body.style.pointerEvents;
+    document.body.style.pointerEvents = "none";
+    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+    document.body.style.pointerEvents = prev;
+    const dropEl = el?.closest?.("[data-explorer-drop]") as HTMLElement | null;
+    return dropEl?.getAttribute("data-explorer-drop") ?? null;
+  };
 
   const iconMenuItems = (appId: string): ContextItem[] => {
     const app = apps.find((a) => a.id === appId);
@@ -234,6 +244,11 @@ const Apps = ({
               isAppDraggingRef.current = true;
               setIconMenu(null);
               setFolderMenu(null);
+              setExplorerDrag({
+                type: "app",
+                id: app.id,
+                source: "desktop",
+              });
             }}
             animate={{
               x: app.defaultCol * gridSize,
@@ -245,15 +260,9 @@ const Apps = ({
               setHoverFolderId(over?.id ?? null);
             }}
             onDragEnd={(e, info) => {
-              const el = document.elementFromPoint(
-                info.point.x,
-                info.point.y
-              ) as HTMLElement | null;
-              const dropEl = el?.closest?.(
-                "[data-explorer-drop]"
-              ) as HTMLElement | null;
-              const drop = dropEl?.getAttribute("data-explorer-drop");
+              setExplorerDrag(null);
 
+              const drop = resolveExplorerDrop(info.point.x, info.point.y);
               if (drop) {
                 const movingIds = selectedAppIds.includes(app.id)
                   ? selectedAppIds

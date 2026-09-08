@@ -34,8 +34,14 @@ export type ClipboardPayload =
     }
   | null;
 
+export type ExplorerDrag =
+  | { type: "app"; id: string; source: "desktop" | "explorer" }
+  | { type: "folder"; id: string; source: "desktop" | "explorer" }
+  | null;
+
 const WIN_Z_MIN = 40;
 const WIN_Z_MAX = 49;
+
 interface AppsState {
   apps: AppConfigWithWindow[];
   selectedAppIds: string[];
@@ -44,6 +50,7 @@ interface AppsState {
   folders: ExplorerFolder[];
   explorerPath: string | null;
   pinnedDrives: ("c" | "d")[];
+  explorerDrag: ExplorerDrag;
   setSelectedAppIds: (ids: string[]) => void;
   openApp: (id: string) => void;
   closeApp: (id: string) => void;
@@ -84,6 +91,7 @@ interface AppsState {
   setExplorerPath: (path: string | null) => void;
   openFolderInExplorer: (folderId: string) => void;
   togglePinDrive: (driveId: "c" | "d") => void;
+  setExplorerDrag: (payload: ExplorerDrag) => void;
   getOpenApps: () => AppConfigWithWindow[];
   getPinnedToStart: () => AppConfigWithWindow[];
   getPinnedToTaskbar: () => AppConfigWithWindow[];
@@ -126,8 +134,10 @@ export const useAppsStore = create<AppsState>((set, get) => ({
   folders: [],
   explorerPath: null,
   pinnedDrives: ["c", "d"],
+  explorerDrag: null,
 
   setSelectedAppIds: (ids) => set({ selectedAppIds: ids }),
+  setExplorerDrag: (payload) => set({ explorerDrag: payload }),
 
   focusApp: (id) =>
     set((state) => {
@@ -286,7 +296,6 @@ export const useAppsStore = create<AppsState>((set, get) => ({
     })),
 
   setClipboard: (payload) => set({ clipboard: payload }),
-
   clearClipboard: () => set({ clipboard: null }),
 
   createFolder: ({ name, driveId, parentId = null, isOnDesktop = false }) => {
@@ -367,12 +376,16 @@ export const useAppsStore = create<AppsState>((set, get) => ({
 
   moveAppToFolder: (appId, targetFolderId, opts) =>
     set((state) => {
-      let folders = state.folders.map((f) => {
+      const folders = state.folders.map((f) => {
         let appIds = f.appIds;
         if (opts?.fromFolderId && f.id === opts.fromFolderId) {
           appIds = appIds.filter((id) => id !== appId);
         }
-        if (targetFolderId && f.id === targetFolderId && !appIds.includes(appId)) {
+        if (
+          targetFolderId &&
+          f.id === targetFolderId &&
+          !appIds.includes(appId)
+        ) {
           appIds = [...appIds, appId];
         }
         return { ...f, appIds };
@@ -393,7 +406,11 @@ export const useAppsStore = create<AppsState>((set, get) => ({
       set((s) => {
         let folders = s.folders.map((f) => {
           let appIds = f.appIds;
-          if (clip.mode === "cut" && clip.fromFolderId && f.id === clip.fromFolderId) {
+          if (
+            clip.mode === "cut" &&
+            clip.fromFolderId &&
+            f.id === clip.fromFolderId
+          ) {
             appIds = appIds.filter((id) => !clip.ids.includes(id));
           }
           if (folderId && f.id === folderId) {
@@ -408,7 +425,7 @@ export const useAppsStore = create<AppsState>((set, get) => ({
             clip.ids.includes(app.id) ? { ...app, isOnDesktop: false } : app
           );
         }
-        if (!folderId && (clip.mode === "copy" || clip.mode === "cut")) {
+        if (!folderId) {
           const occupied = new Set(
             apps
               .filter((a) => a.isOnDesktop)
