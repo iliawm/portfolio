@@ -2,7 +2,7 @@
 
 import { CiSearch } from "react-icons/ci";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MainMenu from "./Menu/MainMenu";
 import SearchMenu from "./Menu/SearchMenu";
 import { useTheme } from "next-themes";
@@ -10,6 +10,7 @@ import { FaCheck } from "react-icons/fa6";
 import SystemTray from "./Menu/SystemTray";
 import { useAppsStore } from "@/store/useAppsStore";
 import Apps from "../main/Apps/Apps";
+import { IoClose } from "react-icons/io5";
 
 const TaskBar = () => {
   const [Menu, SetMenu] = useState(false);
@@ -27,7 +28,11 @@ const TaskBar = () => {
   const restoreApp = useAppsStore((s) => s.restoreApp);
   const openApp= useAppsStore((s) => s.openApp);
   const toggleMinimize = useAppsStore((s) => s.toggleMinimize);
-
+  const [HoverMinimize,SetHoverMinimize] = useState(false);
+  const [Id,SetId] = useState("");
+  const [Name,SetName] = useState("");
+  const closeApp = useAppsStore((s) => s.closeApp);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     SetMenuIndex(1);
   }, [search]);
@@ -44,7 +49,36 @@ const TaskBar = () => {
   }, [Mode]);
 
   const closeMenu = () => SetMenu(false);
+  const hoverMenu =()=>{
+    switch(HoverMinimize){
+      case true:
+        return(
+          <div className="w-45 h-35 bg-black absolute bottom-9 left-0 rounded-xl flex flex-col justify-start hover:opacity-80 cursor-pointer">
+            <div className="text-white flex justify-end   ">
+              <div className="w-full p-1 flex items-center justify-between h-fit " onClick={()=>{
+                if(Id.length>1) return closeApp(Id);
+              }}> 
+              <div className="text-white text-sm ml-1 mt-1">
+              {Name}  
+              </div> 
+              <div>
+              <IoClose />
+              </div> 
+              </div>
+              </div> 
+              <div className="w-full h-full  overflow-hidden px-7 py-2 relative">
+                <Image src={"/AppIcons/placeholder.png"} alt="Image" width={50} height={50} className="w-full h-full invert-50 "/> 
+              </div>
+          </div>
+       )
+      case false:
+        return (
+          <div className="hidden">
 
+          </div>
+        )
+    }
+  }
   const renderMenu = () => {
     switch (menuIndex) {
       case 0:
@@ -112,6 +146,7 @@ const TaskBar = () => {
         e.stopPropagation();
       }}
     >
+      
       <div
         className={`fixed top-25 -right-101 flex h-fit w-fit items-center justify-start gap-5 rounded-lg bg-blue-500 px-4 py-5 font-bold transition-all ease-linear ${
           Mode !== 4 ? "-translate-x-101" : ""
@@ -216,10 +251,54 @@ const TaskBar = () => {
               e.preventDefault()
               
             }}
+            onMouseEnter={()=>{
+              if(app.minimized) {
+                SetHoverMinimize(true)
+                SetId(app.id)
+                SetName(app.name)
+                if(hideTimeoutRef.current){
+                  clearTimeout(hideTimeoutRef.current);
+                }
+              };
+              if(!app.minimized) {
+                SetHoverMinimize(false)
+                SetId("")
+              }
+              
+            }}
+            onMouseLeave={()=>{
+              hideTimeoutRef.current = setTimeout(() => {
+                SetHoverMinimize(false);
+                SetId("");
+                SetName("");
+              }, 150);
+            }}
             className={`relative flex h-full w-12 items-center justify-center rounded-lg transition-all hover:scale-[1.08] active:scale-100 ${
               isDark ? "hover:bg-gray-600" : "hover:bg-gray-200"
-            } ${app.minimized ? "bg-white/5 opacity-70" : "bg-white/10"}`}
+            } ${app.minimized ? "bg-white/5 " : "bg-white/10"}`}
           >
+            {
+              HoverMinimize&& Id===app.id&&(
+                <div className="w-fit h-fit absolute mr-40" onMouseEnter={()=>{
+                  if (hideTimeoutRef.current) {
+                  clearTimeout(hideTimeoutRef.current);
+                  hideTimeoutRef.current = null;
+              }
+              
+                }}
+                onMouseLeave={()=>{
+                  hideTimeoutRef.current = setTimeout(() => {
+                    SetHoverMinimize(false);
+                    SetId("");
+                  },150)
+                }} 
+                onClick={()=>{
+                  restoreApp(Id)
+                }}     
+                >{hoverMenu()}</div> 
+              )
+              
+            }
             {!app.isIconpath ? (
               <span className="text-xl leading-none">{app.icon}</span>
             ) : (
