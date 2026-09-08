@@ -1097,7 +1097,7 @@ export default function ThisPc({
                         isDark ? "border-white/15" : "border-black/15"
                       }`}
                     >
-                      Drop apps here or right-click → New folder
+                       right-click → New folder
                     </div>
                   )}
                 </div>

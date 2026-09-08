@@ -62,6 +62,7 @@ const Apps = ({
     name: string;
   } | null>(null);
   const [hoverFolderId, setHoverFolderId] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const desktopFolders = folders.filter((f) => f.isOnDesktop);
   const desktopApps = apps.filter((a) => a.isOnDesktop);
@@ -89,12 +90,17 @@ const Apps = ({
     if (!rect) return null;
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    const col = Math.floor(x / gridSize);
-    const row = Math.floor(y / gridSize);
     return (
-      desktopFolders.find(
-        (f) => (f.defaultCol ?? 0) === col && (f.defaultRow ?? 0) === row
-      ) ?? null
+      desktopFolders.find((f) => {
+        const left = (f.defaultCol ?? 0) * gridSize;
+        const top = (f.defaultRow ?? 0) * gridSize;
+        return (
+          x >= left &&
+          x < left + gridSize &&
+          y >= top &&
+          y < top + gridSize
+        );
+      }) ?? null
     );
   };
 
@@ -110,10 +116,16 @@ const Apps = ({
     );
 
   const resolveExplorerDrop = (clientX: number, clientY: number) => {
-    const prev = document.body.style.pointerEvents;
-    document.body.style.pointerEvents = "none";
+    // Disable pointer events only on desktop icons so elementFromPoint
+    // can hit This PC / explorer drop targets underneath the dragged icon.
+    const icons = document.querySelectorAll<HTMLElement>("[data-desktop-icon]");
+    icons.forEach((el) => {
+      el.style.pointerEvents = "none";
+    });
     const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
-    document.body.style.pointerEvents = prev;
+    icons.forEach((el) => {
+      el.style.pointerEvents = "";
+    });
     const dropEl = el?.closest?.("[data-explorer-drop]") as HTMLElement | null;
     return dropEl?.getAttribute("data-explorer-drop") ?? null;
   };
@@ -149,18 +161,15 @@ const Apps = ({
       },
       {
         label: "Paste",
-        disabled: !clipboard || clipboard.type !== "app",
-        onClick: () => {
-          if (!clipboard || clipboard.type !== "app") return;
-          clipboard.ids.forEach((id) => setOnDesktop(id, true));
-          if (clipboard.mode === "cut") setClipboard(null);
-        },
+        disabled: !clipboard,
         dividerAfter: true,
       },
+      { label: "Pin to Start", disabled: true },
+      { label: "Pin to taskbar", disabled: true, dividerAfter: true },
       {
         label: "Delete",
         danger: true,
-        onClick: () => setOnDesktop(appId, false),
+        disabled: true,
         dividerAfter: true,
       },
       {
@@ -188,7 +197,6 @@ const Apps = ({
             addAppToFolder(folderId, id);
             if (clipboard.mode === "cut") setOnDesktop(id, false);
           });
-          if (clipboard.mode === "cut") setClipboard(null);
         },
         dividerAfter: true,
       },
@@ -217,6 +225,7 @@ const Apps = ({
         return (
           <motion.div
             key={app.id || index}
+            data-desktop-icon
             className={`absolute hidden cursor-pointer select-none md:flex ${
               active
                 ? isDark
@@ -229,7 +238,12 @@ const Apps = ({
             style={{
               width: `${gridSize}px`,
               height: `${gridSize}px`,
-              zIndex: active ? 15 : 10,
+              zIndex:
+                draggingId === app.id
+                  ? 9999
+                  : active
+                    ? 15
+                    : 10,
             }}
             drag
             dragMomentum={false}
@@ -242,6 +256,7 @@ const Apps = ({
             }}
             onDragStart={() => {
               isAppDraggingRef.current = true;
+              setDraggingId(app.id);
               setIconMenu(null);
               setFolderMenu(null);
               setExplorerDrag({
@@ -260,6 +275,7 @@ const Apps = ({
               setHoverFolderId(over?.id ?? null);
             }}
             onDragEnd={(e, info) => {
+              setDraggingId(null);
               setExplorerDrag(null);
 
               const drop = resolveExplorerDrop(info.point.x, info.point.y);
@@ -351,12 +367,14 @@ const Apps = ({
                   return { id, col: newCol, row: newRow };
                 });
 
-                if (canMove) updateMultiplePositions(newPositions);
+                if (canMove) {
+                  updateMultiplePositions(newPositions);
+                }
               } else {
                 let finalCol = targetCol;
                 let finalRow = targetRow;
 
-                if (isOccupied(finalCol, finalRow, [app.id])) {
+                if (isOccupied(finalCol, finalRow, movingIds)) {
                   const candidates = [
                     { col: finalCol + 1, row: finalRow },
                     { col: finalCol - 1, row: finalRow },
@@ -374,7 +392,7 @@ const Apps = ({
                       p.col < maxCols &&
                       p.row >= 0 &&
                       p.row < maxRows &&
-                      !isOccupied(p.col, p.row, [app.id])
+                      !isOccupied(p.col, p.row, movingIds)
                   );
 
                   if (free) {
@@ -384,7 +402,7 @@ const Apps = ({
                     let found = false;
                     for (let r = 0; r < maxRows && !found; r++) {
                       for (let c = 0; c < maxCols && !found; c++) {
-                        if (!isOccupied(c, r, [app.id])) {
+                        if (!isOccupied(c, r, movingIds)) {
                           finalCol = c;
                           finalRow = r;
                           found = true;
@@ -422,7 +440,7 @@ const Apps = ({
             onContextMenu={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const pos = clampMenuPosition(e.clientX, e.clientY, 220, 280);
+              const pos = clampMenuPosition(e.clientX, e.clientY);
               setSelectedAppIds([app.id]);
               setFolderMenu(null);
               setIconMenu({ ...pos, appId: app.id });
@@ -548,19 +566,19 @@ const Apps = ({
           }}
         >
           <div
-            className={`w-full max-w-sm rounded-xl border p-4 shadow-2xl ${
-              isDark
-                ? "border-white/10 bg-[#2c2c2c] text-white"
-                : "border-black/10 bg-white text-neutral-900"
+            className={`w-full max-w-xs rounded-lg p-4 shadow-xl ${
+              isDark ? "bg-[#2c2c2c] text-white" : "bg-white text-neutral-900"
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="mb-3 text-sm font-semibold">Rename</h3>
+            <h3 className="mb-3 text-sm font-semibold">Rename folder</h3>
             <input
               autoFocus
               value={renameState.name}
               onChange={(e) =>
-                setRenameState({ ...renameState, name: e.target.value })
+                setRenameState((s) =>
+                  s ? { ...s, name: e.target.value } : s
+                )
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -569,10 +587,10 @@ const Apps = ({
                 }
                 if (e.key === "Escape") setRenameState(null);
               }}
-              className={`mb-4 w-full rounded-md px-3 py-2 text-sm outline-none ring-1 ${
+              className={`mb-3 w-full rounded-md border px-3 py-1.5 text-sm outline-none ${
                 isDark
-                  ? "bg-[#1c1c1c] ring-white/10"
-                  : "bg-black/5 ring-black/10"
+                  ? "border-white/20 bg-white/5"
+                  : "border-black/15 bg-black/5"
               }`}
             />
             <div className="flex justify-end gap-2">
