@@ -14,12 +14,12 @@ export default function Settings({
 }) {
   return (
     <WindowFrame
-      title="Settings"
+      title="porfolio"
       onClose={onClose}
       onMinimize={onMinimize}
       minimized={minimized}
     >
-      <p>Settings panel placeholder.</p>
+      <p>portfolio panel placeholder.</p>
     </WindowFrame>
   );
 }

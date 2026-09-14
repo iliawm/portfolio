@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useAppsStore } from "@/store/useAppsStore";
+import { useSearchParams } from "next/navigation";
 
 type ResizeDir = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 
@@ -33,7 +34,8 @@ export default function WindowFrame({
   const [maximized, setMaximized] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
-
+  const sP = useSearchParams()
+  const [port,setPort]=useState(false)
   const focusApp = useAppsStore((s) => s.focusApp);
   const zIndex = useAppsStore((s) => {
     if (!appId) return 30;
@@ -87,6 +89,17 @@ export default function WindowFrame({
   const bringFront = () => {
     if (appId) focusApp(appId);
   };
+  useEffect(()=>{
+    const ans=sP.get("p")
+    if(ans){
+      if(ans==="Open"){
+        setPort(true)
+      }
+      else{
+        setPort(false)
+      }
+    }
+  },[sP])
 
   const onMove = useCallback(
     (e: PointerEvent) => {
@@ -166,7 +179,7 @@ export default function WindowFrame({
     window.addEventListener("pointerup", onUp);
   };
 
-  const toggleMaximize = () => {
+   const toggleMaximize = () => {
     bringFront();
     if (!maximized) {
       preMax.current = { ...pos.current };

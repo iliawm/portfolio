@@ -11,6 +11,8 @@ import ContextMenu, {
   type ContextItem,
 } from "../ContextMenu";
 
+import { useRouter } from "next/navigation";
+
 interface AppsProps {
   gridSize: number;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -26,7 +28,7 @@ const Apps = ({
 }: AppsProps) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
-
+  const router = useRouter()
   const apps = useAppsStore((s) => s.apps);
   const folders = useAppsStore((s) => s.folders);
   const selectedAppIds = useAppsStore((s) => s.selectedAppIds);
@@ -457,6 +459,9 @@ const Apps = ({
             }}
             onDoubleClick={() => {
               handle_double_clicks(app.id);
+              if(app.id=== "projects"){
+                router.push("?p=Open")
+              }
             }}
           >
             <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center">
