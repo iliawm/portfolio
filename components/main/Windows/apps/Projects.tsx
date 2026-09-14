@@ -23,7 +23,7 @@ export default function Projects({
   const scroll = useMotionValue(0);
 
   const smoothScroll = useSpring(scroll, {
-    stiffness: 100,
+    stiffness: 40,
     damping: 20,
   });
 
@@ -43,20 +43,26 @@ useEffect(() => {
   const handleWheel = (event: WheelEvent) => {
     const current = scroll.get();
     const next = current + event.deltaY;
-      console.log(next)
+
+    let boundedNext;
+
     if (next < 0) {
-      scroll.set(0);
+      boundedNext = 0;
     } else if (next > 1000) {
-      scroll.set(1000);
-    } else if (next >= 0 && next <= 1000) {
-      scroll.set(next);
+      boundedNext = 1000;
+    } else {
+      boundedNext = next;
     }
 
-    if (event.deltaY > 0) {
+    scroll.set(boundedNext);
+
+    if (boundedNext >= 100) {
       setShowNext(true);
-    } else if (event.deltaY < 0) {
+    } else if (boundedNext < 100) {
       setShowNext(false);
     }
+
+    console.log(boundedNext);
   };
 
   window.addEventListener("wheel", handleWheel);
@@ -65,6 +71,7 @@ useEffect(() => {
     window.removeEventListener("wheel", handleWheel);
   };
 }, [scroll]);
+
   return (
     <WindowFrame
       appId={id}
@@ -80,28 +87,28 @@ useEffect(() => {
             style={{
               background,
             }}
+            
           >
             <motion.h1 className="mr-auto mb-auto w-fit max-w-full text-nowrap text-2xl font-black text-white mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl" >
               Hello im Iliawm
             </motion.h1>
-
-            <motion.h2 className="h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference text-white  @sm:text-3xl @md:text-4xl @lg:text-5xl"
-            initial={{
-                scale:1,
-                // background:"",
+            <motion.h2
+              className={`h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl ${
+                showNext ? "text-black" : ""
+              }`}
+              initial={{
+                scale: 1,
               }}
-            animate={{
-              scale: showNext ? 200 : 1,
-              
-              color: showNext ? "black" :"unset",
-              mixBlendMode:showNext ? "unset" :"difference",
-              // background:showNext ? "black" :"unset",
-            }}
+              animate={{
+                scale: showNext ? 200 : 1,
+                mixBlendMode: showNext ? "unset" : "difference",
+              }}
               transition={{
-                delay:1,
-              duration: 1.2,
-              ease: "easeInOut",
-            }}>
+                delay: showNext ? 0.7 : 0,
+                duration: 1.2,
+                ease: "easeInOut",
+              }}
+            >
               I'm a fullstack dev
             </motion.h2>
 
@@ -117,19 +124,20 @@ useEffect(() => {
           </motion.section>
 
           <motion.section
-            className="@container absolute inset-0 flex min-h-56 w-full items-center gap-4 rounded-2xl bg-black p-4"
+            className="@container absolute inset-0 flex min-h-screen w-full items-center gap-4  bg-black p-4"
             initial={{
               opacity: 0,
-              y: 100,
+              y: 0,
             }}
             animate={{
               opacity: showNext ? 1 : 0,
-              y: showNext ? 0 : 100,
+              display:showNext ? "hidden" : "flex",
+              
               zIndex:showNext ? 20 : 0,
             }}
             transition={{
-              delay: 1.5,
-              duration: 0.5,
+              delay: 1,
+              duration: 0.3,
               ease: "linear",
             }}
           >
