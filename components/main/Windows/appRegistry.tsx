@@ -16,7 +16,7 @@ export type WindowProps = {
 
 export const APP_WINDOWS: Record<string, ComponentType<WindowProps>> = {
   "about-me": AboutMe,
-  projects: Projects,
+  portfolio: Projects,
   cmd: Cmd,
   settings: Settings,
   This_Pc: ThisPc,

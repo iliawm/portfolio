@@ -29,8 +29,8 @@ export const DESKTOP_APPS: AppConfig[] = [
     lastOpened: null,
   },
   {
-    id: "projects",
-    name: "Projects",
+    id: "portfolio",
+    name: "Portfolio",
     icon: "📁",
     defaultCol: 0,
     defaultRow: 1,
@@ -84,5 +84,4 @@ export const DESKTOP_APPS: AppConfig[] = [
     isOnDesktop: true,
     lastOpened: null,
   },
-  
 ];

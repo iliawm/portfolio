@@ -11,7 +11,7 @@ import ContextMenu, {
   type ContextItem,
 } from "../ContextMenu";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface AppsProps {
   gridSize: number;
@@ -29,6 +29,8 @@ const Apps = ({
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
   const router = useRouter()
+  const searchParams = useSearchParams();
+
   const apps = useAppsStore((s) => s.apps);
   const folders = useAppsStore((s) => s.folders);
   const selectedAppIds = useAppsStore((s) => s.selectedAppIds);
@@ -77,7 +79,14 @@ const Apps = ({
       setFolderMenu(null);
     }
   }, [clicked, setSelectedAppIds]);
-
+  useEffect(()=>{
+    if(searchParams){
+      const ans =searchParams.get("p")
+      if(ans==="Open"){
+        openApp("portfolio")
+      }
+    }
+  },[searchParams])
   const handle_clicks = () => {
     setLastClick(Date.now() / 1000);
   };
@@ -459,7 +468,7 @@ const Apps = ({
             }}
             onDoubleClick={() => {
               handle_double_clicks(app.id);
-              if(app.id=== "projects"){
+              if(app.id=== "portfolio"){
                 router.push("?p=Open")
               }
             }}

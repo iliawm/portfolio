@@ -34,8 +34,8 @@ export default function WindowFrame({
   const [maximized, setMaximized] = useState(false);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== "light";
-  const sP = useSearchParams()
-  const [port,setPort]=useState(false)
+  const sP = useSearchParams();
+  const [port, setPort] = useState(false);
   const focusApp = useAppsStore((s) => s.focusApp);
   const zIndex = useAppsStore((s) => {
     if (!appId) return 30;
@@ -89,17 +89,23 @@ export default function WindowFrame({
   const bringFront = () => {
     if (appId) focusApp(appId);
   };
-  useEffect(()=>{
-    const ans=sP.get("p")
-    if(ans){
-      if(ans==="Open"){
-        setPort(true)
-      }
-      else{
-        setPort(false)
-      }
+
+  useEffect(() => {
+    const ans = sP.get("p");
+    if (ans === "Open") {
+      setPort(true);
+      setMaximized(true);
+      pos.current = {
+        x: 0,
+        y: 0,
+        w: window.innerWidth,
+        h: window.innerHeight - TASKBAR_H,
+      };
+      apply();
+    } else {
+      setPort(false);
     }
-  },[sP])
+  }, [sP, apply]);
 
   const onMove = useCallback(
     (e: PointerEvent) => {
@@ -179,7 +185,7 @@ export default function WindowFrame({
     window.addEventListener("pointerup", onUp);
   };
 
-   const toggleMaximize = () => {
+  const toggleMaximize = () => {
     bringFront();
     if (!maximized) {
       preMax.current = { ...pos.current };
