@@ -105,7 +105,7 @@ useEffect(() => {
             <motion.h2
               className={`h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl `}
               initial={{
-                scale: 1,
+                scale: 3,
               }}
               animate={{
                 scale: showNext ? 200 : 1,
@@ -113,7 +113,7 @@ useEffect(() => {
               }}
               transition={{
                 delay: showNext ? 0.7 : 0,
-                duration: 1.2,
+                duration: 1,
                 ease: "easeInOut",
               }}
             >
@@ -144,21 +144,26 @@ useEffect(() => {
               zIndex:showNext ? 20 : 0,
             }}
             transition={{
-              delay: 1,
-              duration: 0.3,
+              delay: 0.5,
+              duration: 1,
               ease: "linear",
             }}
           >
-            <div className="border border-gray-600 w-8/10 h-9/10 ml-3 flex flex-col p-3 rounded-xl">
+            <div className="border border-gray-600 w-3/10 h-9/10 ml-3 flex flex-col p-3 rounded-xl">
               
             </div>
-            <Canvas id="canvas" camera={{position:[1,0.7,2], fov:50 ,near:1,far:100}} >
+            <div className="w-full h-full flex flex-col py-10">
+            <Canvas id="canvas" camera={{position:[1.8,1,3], fov:30 ,near:1,far:120}} className="w-full h-full">
 
               <Light/>
-              <BmwModel scale={0.06} position={[0.3,0,0.3]} />
+              <BmwModel scale={0.1} position={[0.4,-0.1,0.2]} color="black"/>
               
               <OrbitControls enableZoom={false} rotateSpeed={0.2}/>
             </Canvas>
+            <div className="w-full h-30 border rounded-2xl">
+
+            </div>
+            </div>
           </motion.section>
         </div>
       </motion.div>
