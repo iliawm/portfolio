@@ -1,6 +1,8 @@
 "use client";
 
+import { Canvas } from "@react-three/fiber";
 import WindowFrame from "../WindowFrame";
+
 import {
   motion,
   useMotionValue,
@@ -8,6 +10,9 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { Box, OrbitControls } from "@react-three/drei";
+import BmwModel from "@/components/models/Scene";
+
 
 export default function Projects({
   id,
@@ -93,15 +98,13 @@ useEffect(() => {
               Hello im Iliawm
             </motion.h1>
             <motion.h2
-              className={`h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl ${
-                showNext ? "text-black" : ""
-              }`}
+              className={`h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl `}
               initial={{
                 scale: 1,
               }}
               animate={{
                 scale: showNext ? 200 : 1,
-                mixBlendMode: showNext ? "unset" : "difference",
+                // mixBlendMode: showNext ? "unset" : "difference",
               }}
               transition={{
                 delay: showNext ? 0.7 : 0,
@@ -141,7 +144,10 @@ useEffect(() => {
               ease: "linear",
             }}
           >
-            
+            <Canvas id="canvas" camera={{position:[0,2,5], fov:50 ,near:0.1,far:100}}>
+              <BmwModel scale={0.06} position={[0,0,0]}/>
+              <OrbitControls enableZoom={false}/>
+            </Canvas>
           </motion.section>
         </div>
       </motion.div>

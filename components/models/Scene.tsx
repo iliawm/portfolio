@@ -9,7 +9,7 @@ Title: BMW M4 Modified Widebody
 
 import * as THREE from 'three'
 import React from 'react'
-import { useGLTF } from '@react-three/drei'
+import { useGLTF, useTexture } from '@react-three/drei'
 import { GLTF } from 'three-stdlib'
 
 type GLTFAction = THREE.AnimationClip
@@ -112,11 +112,12 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[]
 }
 
-export function Model(props: React.JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF('/scene.gltf') as unknown as GLTFResult
+export default function BmwModel(props: React.JSX.IntrinsicElements['group']) {
+  const { nodes, materials } = useGLTF(`/components/models/Scene.tsx`) as unknown as GLTFResult
+  
   return (
     <group {...props} dispose={null}>
-      {/* ... Rest of your component JSX stays identical ... */}
+      
       <mesh geometry={nodes.Object_8.geometry} material={materials.bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004} position={[0, 0.424, 0]} />
       <mesh geometry={nodes.Object_11.geometry} material={materials.bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004} position={[0, 4.614, 4.994]} />
       <mesh geometry={nodes.Object_14.geometry} material={materials['bBMW_M4CompetitionG82TNR0_2021Base_Material1.001']} position={[0, 0.424, 0]} />
@@ -188,4 +189,4 @@ export function Model(props: React.JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/scene.gltf')
+useGLTF.preload('/components/models/Scene.tsx')
