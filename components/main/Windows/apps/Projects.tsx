@@ -12,6 +12,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Box, OrbitControls } from "@react-three/drei";
 import BmwModel from "@/components/models/Scene";
+import Light from "@/components/model/Light";
 
 
 export default function Projects({
@@ -144,8 +145,13 @@ useEffect(() => {
               ease: "linear",
             }}
           >
-            <Canvas id="canvas" camera={{position:[0,2,5], fov:50 ,near:0.1,far:100}} >
-              <BmwModel scale={0.06} position={[0,0,0]}/>
+            <div className="bg-cyan-900 w-8/10 h-6/10 ">
+
+            </div>
+            <Canvas id="canvas" camera={{position:[1,0.7,2], fov:50 ,near:1,far:100}} >
+              
+              <Light/>
+              <BmwModel scale={0.06} position={[0.3,0,0.3]}/>
               
               <OrbitControls enableZoom={false}/>
             </Canvas>
