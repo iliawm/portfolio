@@ -158,7 +158,7 @@ useEffect(() => {
               <Light/>
               <BmwModel scale={0.1} position={[0.4,-0.1,0.2]} color="black"/>
               
-              <OrbitControls enableZoom={false} rotateSpeed={0.2}/>
+              <OrbitControls enableZoom={false} rotateSpeed={0.2} enablePan={false}/>
             </Canvas>
             <div className="w-full h-30 border rounded-2xl">
 
