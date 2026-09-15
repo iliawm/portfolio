@@ -113,7 +113,7 @@ type GLTFResult = GLTF & {
 }
 
 export default function BmwModel(props: React.JSX.IntrinsicElements['group']) {
-  const { nodes, materials } = useGLTF(`/components/models/Scene.tsx`) as unknown as GLTFResult
+  const { nodes, materials } = useGLTF(`/models/scene.gltf`) as unknown as GLTFResult
   
   return (
     <group {...props} dispose={null}>
@@ -189,4 +189,4 @@ export default function BmwModel(props: React.JSX.IntrinsicElements['group']) {
   )
 }
 
-useGLTF.preload('/components/models/Scene.tsx')
+useGLTF.preload('/models/scene.gltf')

@@ -127,7 +127,7 @@ useEffect(() => {
           </motion.section>
 
           <motion.section
-            className="@container absolute inset-0 flex min-h-screen w-full items-center gap-4  bg-black p-4"
+            className="@container absolute inset-0 flex min-h-screen w-full items-center gap-4  bg-white p-4"
             initial={{
               opacity: 0,
               y: 0,
@@ -144,8 +144,9 @@ useEffect(() => {
               ease: "linear",
             }}
           >
-            <Canvas id="canvas" camera={{position:[0,2,5], fov:50 ,near:0.1,far:100}}>
+            <Canvas id="canvas" camera={{position:[0,2,5], fov:50 ,near:0.1,far:100}} >
               <BmwModel scale={0.06} position={[0,0,0]}/>
+              
               <OrbitControls enableZoom={false}/>
             </Canvas>
           </motion.section>
