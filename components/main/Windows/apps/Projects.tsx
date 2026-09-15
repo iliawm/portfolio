@@ -48,7 +48,11 @@ export default function Projects({
 useEffect(() => {
   const handleWheel = (event: WheelEvent) => {
     const current = scroll.get();
-    const next = current + event.deltaY;
+
+    const next =
+      event.deltaY > 0
+        ? current + 120
+        : current - 120;
 
     let boundedNext;
 
@@ -62,13 +66,13 @@ useEffect(() => {
 
     scroll.set(boundedNext);
 
-    if (boundedNext >= 100) {
+    if (boundedNext >= 120) {
       setShowNext(true);
-    } else if (boundedNext < 100) {
+    } else if (boundedNext < 120) {
       setShowNext(false);
     }
 
-    console.log(boundedNext);
+;
   };
 
   window.addEventListener("wheel", handleWheel);
@@ -128,7 +132,7 @@ useEffect(() => {
           </motion.section>
 
           <motion.section
-            className="@container absolute inset-0 flex min-h-screen w-full items-center gap-4  bg-white p-4"
+            className="@container absolute inset-0 flex h-full w-full items-center gap-4  bg-black "
             initial={{
               opacity: 0,
               y: 0,
@@ -145,15 +149,15 @@ useEffect(() => {
               ease: "linear",
             }}
           >
-            <div className="bg-cyan-900 w-8/10 h-6/10 ">
-
+            <div className="border border-gray-600 w-8/10 h-9/10 ml-3 flex flex-col p-3 rounded-xl">
+              
             </div>
             <Canvas id="canvas" camera={{position:[1,0.7,2], fov:50 ,near:1,far:100}} >
-              
+
               <Light/>
-              <BmwModel scale={0.06} position={[0.3,0,0.3]}/>
+              <BmwModel scale={0.06} position={[0.3,0,0.3]} />
               
-              <OrbitControls enableZoom={false}/>
+              <OrbitControls enableZoom={false} rotateSpeed={0.2}/>
             </Canvas>
           </motion.section>
         </div>

@@ -23,7 +23,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col ">
         {/* lowersize devices error */}
-        <div className="w-full h-full fixed md:hidden flex flex-col items-center justify-center top-0 left-0 bg-black text-white px-20 gap-5" >
+        <div className="w-full h-full fixed z-90 md:hidden flex flex-col items-center justify-center top-0 left-0 bg-black text-white px-20 gap-5" >
           <div className="text-red-400">
             this website was designed for larger screens
             </div>
