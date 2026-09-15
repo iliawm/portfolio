@@ -120,14 +120,14 @@ export default function BmwModel({
       color
     );
   }, [color, materials]);
-useEffect(() => {
-  const windshield = materials.glasswindshiled;
+// useEffect(() => {
+//   const windshield = materials.glasswindshiled;
 
-  // windshield.transparent = true;
-  windshield.opacity = 0.75;
-  windshield.depthWrite = false;
-  windshield.side = THREE.DoubleSide;
-}, [materials]);
+//   // windshield.transparent = true;
+//   windshield.opacity = 0.65;
+//   windshield.depthWrite = false;
+//   windshield.side = THREE.DoubleSide;
+// }, [materials]);
   return (
     <group {...props} dispose={null}>
       <mesh

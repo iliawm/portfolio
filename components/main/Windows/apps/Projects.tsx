@@ -10,9 +10,11 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Box, OrbitControls } from "@react-three/drei";
+import {  OrbitControls } from "@react-three/drei";
 import BmwModel from "@/components/models/Scene";
 import Light from "@/components/model/Light";
+import Image from "next/image";
+
 
 
 export default function Projects({
@@ -27,7 +29,7 @@ export default function Projects({
   minimized?: boolean;
 }) {
   const scroll = useMotionValue(0);
-
+    const [color,setColor]=useState("black")
   const smoothScroll = useSpring(scroll, {
     stiffness: 40,
     damping: 20,
@@ -125,14 +127,14 @@ useEffect(() => {
                 My Name is Ilia. im 22 Years old and im from iran
               </p>
 
-              <div className="font-bold opacity-85 animate-bounce mr-5">
+              <div className="font-bold opacity-85 animate-bounce mr-5 text-2xl">
                 scroll
               </div>
             </div>
           </motion.section>
 
           <motion.section
-            className="@container absolute inset-0 flex h-full w-full items-center gap-4  bg-black "
+            className="@container absolute  inset-0 flex h-full w-full items-center gap-4  bg-black "
             initial={{
               opacity: 0,
               y: 0,
@@ -148,20 +150,41 @@ useEffect(() => {
               duration: 1,
               ease: "linear",
             }}
-          >
-            <div className="border border-gray-600 w-3/10 h-9/10 ml-3 flex flex-col p-3 rounded-xl">
-              
+          > <div className="absolute -z-10 w-full h-full inset-0">
+            <Image src={"/bg/bg.png"} alt={"background"} width={1920} height={1080} className="w-full h-full "/>
+          </div>
+            <div className="bg-black/85 w-full h-9/10 ml-3 flex flex-col p-3 rounded-xl text-white font-semibold text-pretty text-2xl">
+              hello everyone
             </div>
             <div className="w-full h-full flex flex-col py-10">
-            <Canvas id="canvas" camera={{position:[1.8,1,3], fov:30 ,near:1,far:120}} className="w-full h-full">
+            <Canvas id="canvas" camera={{position:[1.8,0.5,2], fov:30 ,near:1,far:50}} className="w-full h-full">
 
               <Light/>
-              <BmwModel scale={0.1} position={[0.4,-0.1,0.2]} color="black"/>
+              <BmwModel scale={0.1} position={[0.4,-0.1,0]} color={color}/>
               
               <OrbitControls enableZoom={false} rotateSpeed={0.2} enablePan={false}/>
             </Canvas>
-            <div className="w-full h-30 border rounded-2xl">
-
+            <div className="w-full h-30  rounded-2xl flex items-center p-10 gap-10 bg-white/55 overflow-hidden transition-all ">
+              <motion.div className="w-full h-full flex items-center gap-5 " 
+              initial={{
+                x:-200
+              }}
+              animate={{
+                x:showNext?0:-200
+              }}
+              transition={{
+                delay:0.6,
+                duration:1,
+                ease:"linear",
+              }}
+              
+              >
+                
+                <h1 className="bg-[linear-gradient(135deg,#007ae6,#4f2ca9,#ec0000)] from-33% via-33% to-33% bg-clip-text text-transparent text-4xl font-black ">BMW M4</h1>
+                  <button className="w-14 h-14 bg-red-600 rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9]" onClick={()=>{setColor("red")}}></button>
+                  <button className="w-14 h-14 bg-blue-700 rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9]" onClick={()=>{setColor("blue")}}></button>
+                  <button className="w-14 h-14 bg-black rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9] border" onClick={()=>{setColor("black")}}></button>
+            </motion.div>
             </div>
             </div>
           </motion.section>
