@@ -10,7 +10,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import {  OrbitControls } from "@react-three/drei";
+import {  ContactShadows, OrbitControls } from "@react-three/drei";
 import BmwModel from "@/components/models/Scene";
 import Light from "@/components/model/Light";
 import Image from "next/image";
@@ -134,58 +134,180 @@ useEffect(() => {
           </motion.section>
 
           <motion.section
-            className="@container absolute  inset-0 flex h-full w-full items-center gap-4  bg-black "
+            className="absolute inset-0 flex h-full w-full flex-col overflow-hidden bg-black"
             initial={{
               opacity: 0,
-              y: 0,
             }}
             animate={{
               opacity: showNext ? 1 : 0,
-              display:showNext ? "hidden" : "flex",
-              
-              zIndex:showNext ? 20 : 0,
+              zIndex: showNext ? 20 : 0,
+              pointerEvents: showNext ? "auto" : "none",
             }}
             transition={{
               delay: 0.5,
-              duration: 1,
-              ease: "linear",
+              duration: 0.8,
+              ease: "easeInOut",
             }}
-          > <div className="absolute -z-10 w-full h-full inset-0">
-            <Image src={"/bg/bg.png"} alt={"background"} width={1920} height={1080} className="w-full h-full "/>
-          </div>
-            <div className="bg-black/65 w-4/10 h-9/10 ml-3 flex flex-col p-3 rounded-2xl text-white font-semibold text-pretty text-2xl">
-              hello everyone
+          >
+            <div className="absolute inset-0">
+              <Image
+                src="/bg/bg.png"
+                alt="Background"
+                fill
+                className="object-cover opacity-20 grayscale"
+                priority
+              />
+              <div className="absolute inset-0 bg-black/70" />
             </div>
-            <div className="w-full h-full flex flex-col py-10">
-            <Canvas id="canvas" camera={{position:[1.8,0.5,2], fov:30 ,near:1,far:50}} className="w-full h-full">
 
-              <Light/>
-              <BmwModel scale={0.1} position={[0.4,-0.1,0]} color={color}/>
-              
-              <OrbitControls enableZoom={false} rotateSpeed={0.2} enablePan={false}/>
-            </Canvas>
-            <div className="w-full h-30  rounded-2xl flex items-center p-10 gap-10 bg-white/55 overflow-hidden transition-all ">
-              <motion.div className="w-full h-full flex items-center gap-5 " 
-              initial={{
-                x:-200
-              }}
-              animate={{
-                x:showNext?0:-200
-              }}
-              transition={{
-                delay:0.6,
-                duration:1,
-                ease:"linear",
-              }}
-              
+            <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+
+              <div className="absolute left-5 top-5 z-20 w-70 max-w-[40%] rounded-2xl border border-white/10 bg-black/50 p-5 text-white backdrop-blur-xl @md:left-8 @md:top-8 @md:p-6">
+                <div className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-white/40">
+                  Featured Project
+                </div>
+
+                <h1 className="text-3xl font-black leading-none @md:text-5xl">
+                  BMW M4
+                </h1>
+
+                <p className="mt-3 text-sm font-medium text-white/60 @md:text-base">
+                  Interactive 3D automotive experience.
+                </p>
+
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                    Next.js
+                  </span>
+
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                    Three.js
+                  </span>
+
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                    R3F
+                  </span>
+                </div>
+
+                <div className="mt-6">
+                  <div className="mb-2 text-xs font-bold uppercase tracking-widest text-white/40">
+                    Explore
+                  </div>
+
+                  <p className="text-xs leading-relaxed text-white/50">
+                    Rotate the vehicle and switch between different paint
+                    configurations.
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative min-h-0 flex-1">
+                <Canvas
+                  id="canvas"
+                  camera={{
+                    position: [1.8, 0.5, 2],
+                    fov: 30,
+                    near: 1,
+                    far: 50,
+                  }}
+                  className="h-full w-full"
+                >
+                  <Light />
+
+                  <ambientLight intensity={0.3} />
+
+                  <mesh
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    position={[0.1, -0.1, 0]}
+                  >
+                    <circleGeometry args={[4, 96]} />
+                    <meshStandardMaterial
+                      color="#111111"
+                      roughness={0.65}
+                      metalness={0.2}
+                    />
+                  </mesh>
+
+                  <BmwModel
+                    scale={0.1}
+                    position={[0.4, -0.1, 0]}
+                    color={color}
+                  />
+
+                  <ContactShadows
+                    position={[0.1, -0.08, 0]}
+                    opacity={0.65}
+                    scale={6}
+                    blur={2}
+                    far={4}
+                  />
+
+                  <OrbitControls
+                    enableZoom={false}
+                    enablePan={false}
+                    rotateSpeed={0.2}
+                  />
+                </Canvas>
+              </div>
+
+              <motion.div
+                className="relative z-20 flex h-24 shrink-0 items-center justify-between gap-6 border-t border-white/10 bg-black/60 px-6 backdrop-blur-2xl @md:px-10"
+                initial={{
+                  y: 80,
+                  opacity: 0,
+                }}
+                animate={{
+                  y: showNext ? 0 : 80,
+                  opacity: showNext ? 1 : 0,
+                }}
+                transition={{
+                  delay: showNext ? 1 : 0,
+                  duration: 0.6,
+                  ease: "easeOut",
+                }}
               >
-                
-                <h1 className="bg-[linear-gradient(135deg,#007ae6,#4f2ca9,#ec0000)] from-33% via-33% to-33% bg-clip-text text-transparent text-4xl font-black ">BMW M4</h1>
-                  <button className="w-14 h-14 bg-red-600 rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9]" onClick={()=>{setColor("red")}}></button>
-                  <button className="w-14 h-14 bg-blue-700 rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9]" onClick={()=>{setColor("blue")}}></button>
-                  <button className="w-14 h-14 bg-black rounded-full hover:opacity-80 cursor-pointer active:scale-[0.9] border" onClick={()=>{setColor("black")}}></button>
-            </motion.div>
-            </div>
+                <div className="flex items-center gap-4">
+                  <div>
+                    <div className="text-xl font-black text-white @md:text-2xl">
+                      BMW M4
+                    </div>
+                    <div className="text-xs font-medium uppercase tracking-widest text-white/40">
+                      Paint
+                    </div>
+                  </div>
+
+                  <div className="h-8 w-px bg-white/10" />
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      aria-label="Red"
+                      className="h-10 w-10 rounded-full bg-red-600 ring-1 ring-white/10 transition-transform hover:scale-110 active:scale-90"
+                      onClick={() => setColor("red")}
+                    />
+
+                    <button
+                      aria-label="Blue"
+                      className="h-10 w-10 rounded-full bg-blue-700 ring-1 ring-white/10 transition-transform hover:scale-110 active:scale-90"
+                      onClick={() => setColor("blue")}
+                    />
+
+                    <button
+                      aria-label="Black"
+                      className="h-10 w-10 rounded-full bg-black ring-1 ring-white/40 transition-transform hover:scale-110 active:scale-90"
+                      onClick={() => setColor("black")}
+                    />
+                  </div>
+                </div>
+
+                <div className="hidden text-right @md:block">
+                  <div className="text-xs font-bold uppercase tracking-[0.25em] text-white/40">
+                    Interactive 3D
+                  </div>
+                  <div className="mt-1 text-sm font-medium text-white/70">
+                    Drag to explore
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </motion.section>
         </div>
