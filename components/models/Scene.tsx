@@ -6,7 +6,71 @@ import { GLTF } from "three-stdlib";
 type GLTFAction = THREE.AnimationClip;
 
 type BmwModelProps = React.JSX.IntrinsicElements["group"] & {
+  // =========================================================
+  // BODY / EXTERIOR
+  // =========================================================
+
+  // Main BMW paint
   color?: string;
+
+  // Base body parts
+  baseColor?: string;
+
+  // Colored exterior parts
+  colouredPartsColor?: string;
+
+  // Carbon fiber
+  carbonColor?: string;
+
+  // Dark exterior parts
+  darkColor?: string;
+
+  // =========================================================
+  // GLASS / LIGHTS
+  // =========================================================
+
+  windshieldColor?: string;
+  glassColor?: string;
+  redGlassColor?: string;
+  emitColor?: string;
+  wmitRedColor?: string;
+
+  // =========================================================
+  // WHEELS
+  // =========================================================
+
+  // Material.001
+  rimComponentColor?: string;
+
+  // disk.001
+  brakeDiscColor?: string;
+
+  // main
+  rimColor?: string;
+
+  // metalblack
+  blackMetallicColor?: string;
+
+  // sidetyre
+  tireColor?: string;
+
+  // =========================================================
+  // OTHER
+  // =========================================================
+
+  manufacturerPlateColor?: string;
+  badgeColor?: string;
+  lightColor?: string;
+  engineColor?: string;
+  grille5Color?: string;
+  grille6Color?: string;
+  grille7Color?: string;
+  grille8Color?: string;
+  grille9Color?: string;
+  interiorColor?: string;
+  phongColor?: string;
+  material002Color?: string;
+  finalMaterialColor?: string;
 };
 
 type GLTFResult = GLTF & {
@@ -73,63 +137,422 @@ type GLTFResult = GLTF & {
     Object_173: THREE.Mesh;
     Object_176: THREE.Mesh;
   };
+
   materials: {
     bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004: THREE.MeshPhysicalMaterial;
+
     ["bBMW_M4CompetitionG82TNR0_2021Base_Material1.001"]: THREE.MeshPhysicalMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021EngineA_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021Carbon1_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha5A_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha9A_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021InteriorA_Material1: THREE.MeshStandardMaterial;
+
     phong2: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha6A_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha7A_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha8A_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021BadgeA_Material1: THREE.MeshStandardMaterial;
+
     dark: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021LightA_Material1: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021ManufacturerPlateA_Material1: THREE.MeshStandardMaterial;
+
     glasswindshiled: THREE.MeshPhysicalMaterial;
+
     red_glass: THREE.MeshStandardMaterial;
+
     emit: THREE.MeshStandardMaterial;
+
     glass: THREE.MeshStandardMaterial;
+
     wmit_red: THREE.MeshStandardMaterial;
+
     bBMW_M4CompetitionG82TNR0_2021Base_Material1: THREE.MeshStandardMaterial;
+
     ["Material.002"]: THREE.MeshStandardMaterial;
+
     ["Material.001"]: THREE.MeshStandardMaterial;
+
     ["disk.001"]: THREE.MeshStandardMaterial;
+
     main: THREE.MeshPhysicalMaterial;
+
     metalblack: THREE.MeshStandardMaterial;
+
     sidetyre: THREE.MeshStandardMaterial;
+
     Material: THREE.MeshStandardMaterial;
   };
+
   animations: GLTFAction[];
 };
 
 export default function BmwModel({
+  // =========================================================
+  // BODY
+  // =========================================================
+
   color = "#ffffff",
+  baseColor,
+  colouredPartsColor,
+  carbonColor,
+  darkColor,
+
+  // =========================================================
+  // GLASS / LIGHTS
+  // =========================================================
+
+  windshieldColor,
+  glassColor,
+  redGlassColor,
+  emitColor,
+  wmitRedColor,
+
+  // =========================================================
+  // WHEELS
+  // =========================================================
+
+  rimComponentColor,
+  brakeDiscColor,
+  rimColor,
+  blackMetallicColor,
+  tireColor,
+
+  // =========================================================
+  // OTHER
+  // =========================================================
+
+  manufacturerPlateColor,
+  badgeColor,
+  lightColor,
+  engineColor,
+  grille5Color,
+  grille6Color,
+  grille7Color,
+  grille8Color,
+  grille9Color,
+  interiorColor,
+  phongColor,
+  material002Color,
+  finalMaterialColor,
+
   ...props
 }: BmwModelProps) {
   const { nodes, materials } = useGLTF(
     "/models/scene.gltf"
   ) as unknown as GLTFResult;
 
+  // =========================================================
+  // COLOR HELPERS
+  // =========================================================
+
+  const setColor = (
+    material: THREE.Material | undefined,
+    color?: string
+  ) => {
+    if (!material || !color) return;
+
+    const mat = material as THREE.MeshStandardMaterial;
+
+    if ("color" in mat && mat.color) {
+      mat.color.set(color);
+    }
+  };
+
+  // =========================================================
+  // MAIN BODY PAINT
+  //
+  // This controls:
+  // Object_8
+  // Object_11  -> HOOD
+  // Object_23
+  // Object_64
+  // Object_91
+  // Object_167
+  // =========================================================
+
   useEffect(() => {
-    materials.bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004.color.set(
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004,
       color
     );
   }, [color, materials]);
-// useEffect(() => {
-//   const windshield = materials.glasswindshiled;
 
-//   // windshield.transparent = true;
-//   windshield.opacity = 0.65;
-//   windshield.depthWrite = false;
-//   windshield.side = THREE.DoubleSide;
-// }, [materials]);
+  // =========================================================
+  // BASE BODY
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials["bBMW_M4CompetitionG82TNR0_2021Base_Material1.001"],
+      baseColor
+    );
+
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021Base_Material1,
+      baseColor
+    );
+  }, [baseColor, materials]);
+
+  // =========================================================
+  // COLOURED EXTERIOR PARTS
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004,
+      colouredPartsColor
+    );
+  }, [colouredPartsColor, materials]);
+
+  // =========================================================
+  // CARBON
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021Carbon1_Material1,
+      carbonColor
+    );
+  }, [carbonColor, materials]);
+
+  // =========================================================
+  // DARK PARTS
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.dark, darkColor);
+  }, [darkColor, materials]);
+
+  // =========================================================
+  // WINDSHIELD
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.glasswindshiled, windshieldColor);
+  }, [windshieldColor, materials]);
+
+  // =========================================================
+  // GLASS
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.glass, glassColor);
+  }, [glassColor, materials]);
+
+  // =========================================================
+  // RED GLASS
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.red_glass, redGlassColor);
+  }, [redGlassColor, materials]);
+
+  // =========================================================
+  // EMISSIVE MATERIAL
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.emit, emitColor);
+  }, [emitColor, materials]);
+
+  // =========================================================
+  // WMIT RED
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.wmit_red, wmitRedColor);
+  }, [wmitRedColor, materials]);
+
+  // =========================================================
+  // WHEEL
+  // =========================================================
+
+  // Material.001
+  // Rim component
+  useEffect(() => {
+    setColor(materials["Material.001"], rimComponentColor);
+  }, [rimComponentColor, materials]);
+
+  // disk.001
+  // Brake disc
+  useEffect(() => {
+    setColor(materials["disk.001"], brakeDiscColor);
+  }, [brakeDiscColor, materials]);
+
+  // main
+  // Main rim / ring
+  useEffect(() => {
+    setColor(materials.main, rimColor);
+  }, [rimColor, materials]);
+
+  // metalblack
+  // Black metallic wheel details
+  useEffect(() => {
+    setColor(materials.metalblack, blackMetallicColor);
+  }, [blackMetallicColor, materials]);
+
+  // sidetyre
+  // Tire
+  useEffect(() => {
+    setColor(materials.sidetyre, tireColor);
+  }, [tireColor, materials]);
+
+  // =========================================================
+  // MANUFACTURER PLATE
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021ManufacturerPlateA_Material1,
+      manufacturerPlateColor
+    );
+  }, [manufacturerPlateColor, materials]);
+
+  // =========================================================
+  // BMW BADGE
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021BadgeA_Material1,
+      badgeColor
+    );
+  }, [badgeColor, materials]);
+
+  // =========================================================
+  // LIGHT
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021LightA_Material1,
+      lightColor
+    );
+  }, [lightColor, materials]);
+
+  // =========================================================
+  // ENGINE
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021EngineA_Material1,
+      engineColor
+    );
+  }, [engineColor, materials]);
+
+  // =========================================================
+  // GRILLE 5
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha5A_Material1,
+      grille5Color
+    );
+  }, [grille5Color, materials]);
+
+  // =========================================================
+  // GRILLE 6
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha6A_Material1,
+      grille6Color
+    );
+  }, [grille6Color, materials]);
+
+  // =========================================================
+  // GRILLE 7
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha7A_Material1,
+      grille7Color
+    );
+  }, [grille7Color, materials]);
+
+  // =========================================================
+  // GRILLE 8
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha8A_Material1,
+      grille8Color
+    );
+  }, [grille8Color, materials]);
+
+  // =========================================================
+  // GRILLE 9
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021GrilleNoAlpha9A_Material1,
+      grille9Color
+    );
+  }, [grille9Color, materials]);
+
+  // =========================================================
+  // INTERIOR
+  // =========================================================
+
+  useEffect(() => {
+    setColor(
+      materials.bBMW_M4CompetitionG82TNR0_2021InteriorA_Material1,
+      interiorColor
+    );
+  }, [interiorColor, materials]);
+
+  // =========================================================
+  // PHONG
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.phong2, phongColor);
+  }, [phongColor, materials]);
+
+  // =========================================================
+  // MATERIAL.002
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials["Material.002"], material002Color);
+  }, [material002Color, materials]);
+
+  // =========================================================
+  // FINAL MATERIAL
+  // =========================================================
+
+  useEffect(() => {
+    setColor(materials.Material, finalMaterialColor);
+  }, [finalMaterialColor, materials]);
+
   return (
     <group {...props} dispose={null}>
+
+      {/* ===================================================== */}
+      {/* MAIN BODY */}
+      {/* ===================================================== */}
+
       <mesh
         geometry={nodes.Object_8.geometry}
         material={
@@ -137,6 +560,8 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
+      {/* HOOD */}
       <mesh
         geometry={nodes.Object_11.geometry}
         material={
@@ -144,6 +569,7 @@ export default function BmwModel({
         }
         position={[0, 4.614, 4.994]}
       />
+
       <mesh
         geometry={nodes.Object_14.geometry}
         material={
@@ -151,6 +577,7 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_17.geometry}
         material={
@@ -158,6 +585,7 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_20.geometry}
         material={
@@ -165,6 +593,7 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_23.geometry}
         material={
@@ -172,6 +601,8 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
+      {/* SIDE SKIRT */}
       <mesh
         geometry={nodes.Object_26.geometry}
         material={
@@ -179,6 +610,8 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
+      {/* WING */}
       <mesh
         geometry={nodes.Object_32.geometry}
         material={
@@ -186,6 +619,7 @@ export default function BmwModel({
         }
         scale={14.746}
       />
+
       <mesh
         geometry={nodes.Object_35.geometry}
         material={
@@ -193,6 +627,11 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
+      {/* ===================================================== */}
+      {/* ENGINE / FRONT */}
+      {/* ===================================================== */}
+
       <mesh
         geometry={nodes.Object_41.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021EngineA_Material1}
@@ -200,6 +639,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_44.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004}
@@ -207,6 +647,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_47.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Carbon1_Material1}
@@ -214,6 +655,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_50.geometry}
         material={
@@ -223,6 +665,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_53.geometry}
         material={
@@ -232,6 +675,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <group
         position={[0, 0.444, 0]}
         rotation={[Math.PI / 2, 0, 0]}
@@ -239,10 +683,22 @@ export default function BmwModel({
       >
         <mesh
           geometry={nodes.Object_56.geometry}
-          material={materials.bBMW_M4CompetitionG82TNR0_2021InteriorA_Material1}
+          material={
+            materials.bBMW_M4CompetitionG82TNR0_2021InteriorA_Material1
+          }
         />
-        <mesh geometry={nodes.Object_58.geometry} material={materials.phong2} />
+
+        <mesh
+          geometry={nodes.Object_58.geometry}
+          material={materials.phong2}
+        />
       </group>
+
+      {/* ===================================================== */}
+      {/* REAR / EXTERIOR */}
+      {/* ===================================================== */}
+
+      {/* SMALL BACK WING */}
       <mesh
         geometry={nodes.Object_61.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004}
@@ -250,6 +706,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_64.geometry}
         material={
@@ -259,6 +716,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_67.geometry}
         material={
@@ -268,6 +726,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_70.geometry}
         material={
@@ -277,6 +736,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_73.geometry}
         material={
@@ -286,6 +746,8 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* BMW BADGE */}
       <mesh
         geometry={nodes.Object_76.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021BadgeA_Material1}
@@ -293,6 +755,8 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* DARK PART */}
       <mesh
         geometry={nodes.Object_79.geometry}
         material={materials.dark}
@@ -300,6 +764,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_82.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004}
@@ -307,6 +772,8 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* LIGHT */}
       <mesh
         geometry={nodes.Object_85.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021LightA_Material1}
@@ -314,6 +781,8 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* MANUFACTURER PLATE */}
       <mesh
         geometry={nodes.Object_88.geometry}
         material={
@@ -323,6 +792,11 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* ===================================================== */}
+      {/* WINDSHIELD */}
+      {/* ===================================================== */}
+
       <group
         position={[0, 0.446, 0]}
         rotation={[Math.PI / 2, 0, 0]}
@@ -334,11 +808,13 @@ export default function BmwModel({
             materials.bBMW_M4CompetitionG82TNR0_2021PaintTNR_Material_004
           }
         />
+
         <mesh
           geometry={nodes.Object_93.geometry}
           material={materials.glasswindshiled}
         />
       </group>
+
       <group
         position={[0, 0.446, 0]}
         rotation={[Math.PI / 2, 0, 0]}
@@ -348,12 +824,18 @@ export default function BmwModel({
           geometry={nodes.Object_96.geometry}
           material={materials.glasswindshiled}
         />
-        <mesh geometry={nodes.Object_98.geometry} material={materials.red_glass} />
+
+        <mesh
+          geometry={nodes.Object_98.geometry}
+          material={materials.red_glass}
+        />
+
         <mesh
           geometry={nodes.Object_100.geometry}
           material={materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004}
         />
       </group>
+
       <mesh
         geometry={nodes.Object_103.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Coloured_Material_004}
@@ -361,6 +843,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_106.geometry}
         material={materials.emit}
@@ -368,6 +851,7 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
       <mesh
         geometry={nodes.Object_109.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021BadgeA_Material1}
@@ -375,6 +859,11 @@ export default function BmwModel({
         rotation={[Math.PI / 2, 0, 0]}
         scale={4.822}
       />
+
+      {/* ===================================================== */}
+      {/* LOWER BODY */}
+      {/* ===================================================== */}
+
       <mesh
         geometry={nodes.Object_112.geometry}
         material={
@@ -382,6 +871,7 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_115.geometry}
         material={
@@ -389,26 +879,31 @@ export default function BmwModel({
         }
         position={[0, 0.177, 0]}
       />
+
       <mesh
         geometry={nodes.Object_118.geometry}
         material={materials.glass}
         position={[0, 0.172, 0]}
       />
+
       <mesh
         geometry={nodes.Object_121.geometry}
         material={materials.wmit_red}
         position={[0, 0.172, 0]}
       />
+
       <mesh
         geometry={nodes.Object_124.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Base_Material1}
         position={[0, 0.172, 0]}
       />
+
       <mesh
         geometry={nodes.Object_127.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Base_Material1}
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_130.geometry}
         material={
@@ -416,27 +911,36 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_133.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021LightA_Material1}
         position={[0, 0.177, 0]}
       />
+
       <mesh
         geometry={nodes.Object_136.geometry}
         material={materials.bBMW_M4CompetitionG82TNR0_2021Base_Material1}
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_139.geometry}
         material={materials.dark}
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_142.geometry}
         material={materials["Material.002"]}
         rotation={[2.558, 0, Math.PI]}
         scale={0.553}
       />
+
+      {/* ===================================================== */}
+      {/* OTHER BODY PARTS */}
+      {/* ===================================================== */}
+
       <mesh
         geometry={nodes.Object_167.geometry}
         material={
@@ -444,11 +948,13 @@ export default function BmwModel({
         }
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_170.geometry}
         material={materials.dark}
         position={[0, 0.424, 0]}
       />
+
       <mesh
         geometry={nodes.Object_173.geometry}
         material={materials["Material.002"]}
@@ -456,53 +962,97 @@ export default function BmwModel({
         rotation={[2.558, 0, Math.PI]}
         scale={0.553}
       />
+
+      {/* ===================================================== */}
+      {/* WHEEL / RIM ASSEMBLY #1 */}
+      {/* ===================================================== */}
+
       <mesh
         geometry={nodes.Object_29.geometry}
         material={
           materials["bBMW_M4CompetitionG82TNR0_2021Base_Material1.001"]
         }
       />
+
       <mesh
         geometry={nodes.Object_38.geometry}
         material={
           materials["bBMW_M4CompetitionG82TNR0_2021Base_Material1.001"]
         }
       />
+
+      {/* RIM COMPONENT */}
       <mesh
         geometry={nodes.Object_145.geometry}
         material={materials["Material.001"]}
       />
+
+      {/* BRAKE DISC */}
       <mesh
         geometry={nodes.Object_147.geometry}
         material={materials["disk.001"]}
       />
-      <mesh geometry={nodes.Object_149.geometry} material={materials.main} />
+
+      {/* MAIN RIM / RING */}
+      <mesh
+        geometry={nodes.Object_149.geometry}
+        material={materials.main}
+      />
+
+      {/* BLACK METALLIC DETAILS */}
       <mesh
         geometry={nodes.Object_151.geometry}
         material={materials.metalblack}
       />
+
+      {/* TIRE */}
       <mesh
         geometry={nodes.Object_153.geometry}
         material={materials.sidetyre}
       />
+
+      {/* ===================================================== */}
+      {/* WHEEL / RIM ASSEMBLY #2 */}
+      {/* ===================================================== */}
+
+      {/* RIM COMPONENT */}
       <mesh
         geometry={nodes.Object_156.geometry}
         material={materials["Material.001"]}
       />
+
+      {/* BRAKE DISC */}
       <mesh
         geometry={nodes.Object_158.geometry}
         material={materials["disk.001"]}
       />
-      <mesh geometry={nodes.Object_160.geometry} material={materials.main} />
+
+      {/* MAIN RIM / RING */}
+      <mesh
+        geometry={nodes.Object_160.geometry}
+        material={materials.main}
+      />
+
+      {/* BLACK METALLIC DETAILS */}
       <mesh
         geometry={nodes.Object_162.geometry}
         material={materials.metalblack}
       />
+
+      {/* TIRE */}
       <mesh
         geometry={nodes.Object_164.geometry}
         material={materials.sidetyre}
       />
-      <mesh geometry={nodes.Object_176.geometry} material={materials.Material} />
+
+      {/* ===================================================== */}
+      {/* FINAL MATERIAL */}
+      {/* ===================================================== */}
+
+      <mesh
+        geometry={nodes.Object_176.geometry}
+        material={materials.Material}
+      />
     </group>
   );
 }

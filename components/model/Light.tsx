@@ -1,6 +1,7 @@
 import { Environment, Lightformer, SpotLight } from "@react-three/drei"
 
 
+
 const Light = () => {
   return (
     <group name="lights">
@@ -25,10 +26,10 @@ const Light = () => {
             </group>
         </Environment>
         <SpotLight 
-        position={[1,4,-1]}
+        position={[3,4,-1]}
         angle={0.15}
         decay={0}
-        intensity={0.1}
+        
                />
     </group>
   )
