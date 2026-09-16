@@ -358,7 +358,7 @@ export default function Projects({
             }}
           >
             <motion.h1 className="mr-auto mb-auto w-fit max-w-full text-nowrap text-2xl font-black text-white mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl">
-              Hello im Iliawm
+              Hello, I'm Ilia.
             </motion.h1>
 
             <motion.h2
