@@ -1,8 +1,7 @@
 "use client";
-
+import { Space_Grotesk } from "next/font/google";
 import { Canvas } from "@react-three/fiber";
 import WindowFrame from "../WindowFrame";
-
 import {
   motion,
   useMotionValue,
@@ -20,6 +19,7 @@ import {
 import BmwModel from "@/components/models/Scene";
 import Light from "@/components/model/Light";
 import Image from "next/image";
+import Link from "next/link";
 
 type CarPreset = {
   name: string;
@@ -43,6 +43,10 @@ type CarPreset = {
   tireColor: string;
 };
 
+const portfolioFont = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 const PRESETS: CarPreset[] = [
   {
     name: "Shadow",
@@ -345,7 +349,7 @@ export default function Projects({
       onMinimize={onMinimize}
       minimized={minimized}
     >
-      <motion.div className="relative h-full w-full overflow-hidden bg-black">
+      <motion.div className={`${portfolioFont.className} relative h-full w-full overflow-hidden bg-black`}>
         <div className="relative h-full w-full @sm:min-h-64 @md:min-h-72">
           <motion.section
             className="@container flex h-full w-full flex-col items-center justify-center gap-4 rounded-2xl p-4 @sm:min-h-64 @sm:gap-5 @sm:p-5 @md:min-h-72 @md:p-6"
@@ -428,17 +432,17 @@ export default function Projects({
                 </p>
 
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                  <Link href={"https://nextjs.org/"} target="__blank" className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
                     Next.js
-                  </span>
+                  </Link>
 
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                  <Link href={"https://threejs.org/"} target="__blank" className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
                     Three.js
-                  </span>
+                  </Link>
 
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
-                    R3F
-                  </span>
+                   <Link href={"https://motion.dev/"} target="__blank" className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70">
+                      Framer motion
+                  </Link>
                 </div>
 
                 <div className="mt-6">
