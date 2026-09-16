@@ -153,7 +153,7 @@ useEffect(() => {
           > <div className="absolute -z-10 w-full h-full inset-0">
             <Image src={"/bg/bg.png"} alt={"background"} width={1920} height={1080} className="w-full h-full "/>
           </div>
-            <div className="bg-black/85 w-full h-9/10 ml-3 flex flex-col p-3 rounded-xl text-white font-semibold text-pretty text-2xl">
+            <div className="bg-black/65 w-4/10 h-9/10 ml-3 flex flex-col p-3 rounded-2xl text-white font-semibold text-pretty text-2xl">
               hello everyone
             </div>
             <div className="w-full h-full flex flex-col py-10">
