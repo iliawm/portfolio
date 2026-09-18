@@ -349,6 +349,7 @@ export default function Projects({
       onMinimize={onMinimize}
       minimized={minimized}
     >
+      {/* 1st */}
       <motion.div className={`${portfolioFont.className} relative h-full w-full overflow-hidden bg-black`}>
         <div className="relative h-full w-full @sm:min-h-64 @md:min-h-72">
           <motion.section
@@ -388,7 +389,7 @@ export default function Projects({
               </div>
             </div>
           </motion.section>
-
+                {/* 2nd */}
           <motion.section
             className="absolute inset-0 flex h-full w-full flex-col overflow-hidden bg-black"
             initial={{
@@ -875,6 +876,7 @@ export default function Projects({
               </motion.div>
             </div>
           </motion.section>
+          {/* 3rd */}
         </div>
       </motion.div>
     </WindowFrame>
