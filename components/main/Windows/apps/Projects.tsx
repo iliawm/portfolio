@@ -451,6 +451,16 @@ export default function Projects({
             style={{
               background,
             }}
+            animate={{
+              opacity: showNext ? 0 : 1,
+              zIndex: showNext ? 0 : 10,
+              pointerEvents: showNext ? "none" : "auto",
+            }}
+            transition={{
+              opacity: { delay: showNext ? 1.5 : 0, duration: 0.3 },
+              zIndex: { delay: showNext ? 1.5 : 0 },
+              pointerEvents: { delay: showNext ? 1.5 : 0 },
+            }}
           >
             <motion.h1 className="mr-auto mb-auto w-fit max-w-full text-nowrap text-2xl font-black text-white mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl">
               Hello, I'm Ilia.

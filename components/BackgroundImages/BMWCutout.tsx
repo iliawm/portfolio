@@ -11,18 +11,16 @@ export default function BMWCutout() {
       <defs>
         <mask
           id="bmw-cutout"
-          maskUnits="userSpaceOnUse"
           x="0"
           y="0"
           width="1600"
           height="900"
+          maskUnits="userSpaceOnUse"
         >
           <rect
-            x="0"
-            y="0"
             width="1600"
             height="900"
-            fill="white"
+            fill="black"
           />
 
           <text
@@ -30,7 +28,7 @@ export default function BMWCutout() {
             y="450"
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="black"
+            fill="white"
             fontFamily="'BMW Type Next', 'Helvetica Neue', Arial, sans-serif"
             fontSize="190"
             fontWeight="700"
@@ -42,11 +40,18 @@ export default function BMWCutout() {
       </defs>
 
       <rect
+        width="1600"
+        height="900"
+        fill="black"
+      />
+
+      <image
+        href="/bg/bg.png"
         x="0"
         y="0"
         width="1600"
         height="900"
-        fill="black"
+        preserveAspectRatio="xMidYMid slice"
         mask="url(#bmw-cutout)"
       />
     </svg>
