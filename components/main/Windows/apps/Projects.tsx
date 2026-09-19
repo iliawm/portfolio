@@ -9,6 +9,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  AnimatePresence,
 } from "framer-motion";
 
 import { useEffect, useRef, useState } from "react";
@@ -151,6 +152,49 @@ const NORMAL_COLORS = [
   { name: "Purple", value: "#7137c8" },
 ];
 
+const PROJECTS = [
+  {
+    id: "shopping",
+    title: "Shopping Website",
+    tag: "E-commerce",
+    stack: ["Next.js 16", "React 19", "MongoDB", "Auth"],
+    summary:
+      "Full-stack store with product browsing, cart, checkout, user auth and an admin panel for products and orders.",
+    link: "https://github.com/iliawm/ShoppingWebsite",
+    image: "/projects/shopping.png",
+  },
+  {
+    id: "teaching",
+    title: "Teaching Website",
+    tag: "E-commerce + Learning",
+    stack: ["Next.js", "MongoDB", "Better Auth", "Tailwind"],
+    summary:
+      "Combined learning platform and shop with auth, cart, search and a mobile-first user dashboard.",
+    link: "https://github.com/iliawm/teaching-website",
+    image: "/projects/teaching.png",
+  },
+  {
+    id: "portfolio",
+    title: "Desktop Portfolio",
+    tag: "OS UI",
+    stack: ["Next.js", "Framer Motion", "Three.js", "Zustand"],
+    summary:
+      "Windowed desktop experience with apps, taskbar and this interactive 3D showcase.",
+    link: "https://github.com/iliawm/portfolio",
+    image: "/projects/portfolio.png",
+  },
+  {
+    id: "offset",
+    title: "Offset UI",
+    tag: "Component library",
+    stack: ["Next.js 15", "TypeScript", "Tailwind"],
+    summary:
+      "Minimal reusable UI kit focused on clean architecture and customizable components.",
+    link: "https://github.com/iliawm/Offset_ui",
+    image: "/projects/offset.png",
+  },
+];
+
 type CarColors = {
   baseColor: string;
   colouredPartsColor: string;
@@ -257,6 +301,8 @@ export default function Projects({
 
   const [showNext, setShowNext] = useState(false);
   const [showThird, setShowThird] = useState(false);
+  const [showFourth, setShowFourth] = useState(false);
+  const [expandedId, setExpandedId] = useState("shopping");
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -282,6 +328,15 @@ export default function Projects({
   });
 
   useEffect(() => {
+    scroll.set(0);
+    setShowNext(false);
+    setShowThird(false);
+    setShowFourth(false);
+    setExpandedId("shopping");
+    setPanelOpen(false);
+  }, [scroll]);
+
+  useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       const target = event.target as HTMLElement | null;
 
@@ -290,33 +345,25 @@ export default function Projects({
       }
 
       const current = scroll.get();
-
       const next = event.deltaY > 0 ? current + 120 : current - 120;
 
       let boundedNext;
-
-      if (next < 0) {
-        boundedNext = 0;
-      } else if (next > 1000) {
-        boundedNext = 1000;
-      } else {
-        boundedNext = next;
-      }
+      if (next < 0) boundedNext = 0;
+      else if (next > 1000) boundedNext = 1000;
+      else boundedNext = next;
 
       scroll.set(boundedNext);
 
       setShowNext(boundedNext >= 120);
       setShowThird(boundedNext >= 240);
+      setShowFourth(boundedNext >= 360);
     };
 
     window.addEventListener("wheel", handleWheel);
 
     return () => {
       window.removeEventListener("wheel", handleWheel);
-
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [scroll]);
 
@@ -343,10 +390,12 @@ export default function Projects({
     tireColor: carColors.tireColor || activePreset.tireColor,
   };
 
+  const activeProject =
+    PROJECTS.find((p) => p.id === expandedId) ?? PROJECTS[0];
+
   const selectPreset = (preset: CarPreset) => {
     setSelectedPreset(preset.name);
     setColor(preset.color);
-
     setCarColors({
       baseColor: preset.baseColor,
       colouredPartsColor: preset.colouredPartsColor,
@@ -372,12 +421,13 @@ export default function Projects({
 
   const updateCarColor = (key: keyof CarColors, value: string) => {
     setSelectedPreset("");
-
-    setCarColors((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    setCarColors((prev) => ({ ...prev, [key]: value }));
   };
+
+  const page1Visible = !showNext;
+  const page2Visible = showNext && !showThird;
+  const page3Visible = showThird && !showFourth;
+  const page4Visible = showFourth;
 
   return (
     <WindowFrame
@@ -392,14 +442,12 @@ export default function Projects({
       >
         <div className="relative h-full w-full @sm:min-h-64 @md:min-h-72">
           <motion.section
-            className="@container flex h-full w-full flex-col items-center justify-center gap-4 rounded-2xl p-4 @sm:min-h-64 @sm:gap-5 @sm:p-5 @md:min-h-72 @md:p-6"
-            style={{
-              background,
-            }}
+            className="@container absolute inset-0 flex h-full w-full flex-col justify-between overflow-hidden p-6 @sm:p-8 @md:p-10"
+            style={{ background }}
             animate={{
-              opacity: showNext ? 0 : 1,
-              zIndex: showNext ? 0 : 10,
-              pointerEvents: showNext ? "none" : "auto",
+              opacity: page1Visible ? 1 : 0,
+              zIndex: page1Visible ? 10 : 0,
+              pointerEvents: page1Visible ? "auto" : "none",
             }}
             transition={{
               opacity: { delay: showNext ? 1.5 : 0, duration: 0.3 },
@@ -407,50 +455,77 @@ export default function Projects({
               pointerEvents: { delay: showNext ? 1.5 : 0 },
             }}
           >
-            <motion.h1 className="mr-auto mb-auto w-fit max-w-full text-nowrap text-2xl font-black text-white mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl">
-              Hello, I'm Ilia.
-            </motion.h1>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white mix-blend-difference">
+                  Ilia Bayat
+                </p>
+                <p className="mt-1 text-xs font-medium text-white/70 mix-blend-difference">
+                  Tehran · Available for work
+                </p>
+              </div>
+              <div className="hidden gap-2 @md:flex">
+                <span className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white mix-blend-difference">
+                  Next.js
+                </span>
+                <span className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white mix-blend-difference">
+                  Three.js
+                </span>
+                <span className="rounded-full border border-white/25 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white mix-blend-difference">
+                  TypeScript
+                </span>
+              </div>
+            </div>
 
-            <motion.h2
-              className="h-fit w-fit text-nowrap text-2xl font-black mix-blend-difference @sm:text-3xl @md:text-4xl @lg:text-5xl"
-              initial={{
-                scale: 3,
-              }}
-              animate={{
-                scale: showNext ? 200 : 1,
-              }}
-              transition={{
-                delay: showNext ? 0.7 : 0,
-                duration: 1,
-                ease: "easeInOut",
-              }}
-            >
-              I'm a fullstack dev
-            </motion.h2>
-
-            <div className="mt-auto mb-10 flex w-full flex-col items-start justify-between gap-4 @sm:flex-row @sm:items-end">
-              <p className="max-w-xs text-xs font-black text-white mix-blend-difference @sm:text-sm @md:text-xl">
-                My Name is Ilia. im 22 Years old and im from iran
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+              <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white mix-blend-difference">
+                Hello
               </p>
+              <h1 className="max-w-3xl text-4xl font-black leading-[0.95] tracking-tight text-white mix-blend-difference @sm:text-5xl @md:text-6xl @lg:text-7xl">
+                I build fast,
+                <br />
+                interactive products.
+              </h1>
+              <motion.h2
+                className="mt-2 h-fit w-fit text-nowrap text-lg font-semibold text-white mix-blend-difference @md:text-xl"
+                initial={{ scale: 3 }}
+                animate={{ scale: showNext ? 200 : 1 }}
+                transition={{
+                  delay: showNext ? 0.7 : 0,
+                  duration: 1,
+                  ease: "easeInOut",
+                }}
+              >
+                Fullstack engineer · UI focused
+              </motion.h2>
+            </div>
 
-              <div className="mr-5 animate-bounce text-2xl font-bold opacity-85">
-                scroll
+            <div className="flex items-end justify-between gap-4">
+              <p className="max-w-xs text-left text-xs leading-relaxed text-white mix-blend-difference @sm:text-sm">
+                My name is Ilia. I&apos;m 22 years old and I&apos;m from Iran. I
+                ship polished web apps with a focus on performance and motion.
+              </p>
+              <div className="flex flex-col items-end gap-1">
+                <span className="animate-bounce text-sm font-bold uppercase tracking-[0.3em] text-white mix-blend-difference">
+                  Scroll
+                </span>
+                <span className="text-[10px] text-white/60 mix-blend-difference">
+                  to explore
+                </span>
               </div>
             </div>
           </motion.section>
 
           <motion.section
             className="absolute inset-0 flex h-full w-full flex-col overflow-hidden bg-black"
-            initial={{
-              opacity: 0,
-            }}
+            initial={false}
             animate={{
-              opacity: showNext && !showThird ? 1 : 0,
-              zIndex: showNext && !showThird ? 20 : 0,
-              pointerEvents: showNext && !showThird ? "auto" : "none",
+              opacity: page2Visible ? 1 : 0,
+              zIndex: page2Visible ? 20 : 0,
+              pointerEvents: page2Visible ? "auto" : "none",
             }}
             transition={{
-              delay: showNext && !showThird ? 0.5 : 0,
+              delay: page2Visible ? 0.5 : 0,
               duration: 0.8,
               ease: "easeInOut",
             }}
@@ -471,49 +546,42 @@ export default function Projects({
                 <div className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-white/40">
                   Featured Project
                 </div>
-
                 <h1 className="text-3xl font-black leading-none @md:text-5xl">
                   BMW M4
                 </h1>
-
                 <p className="mt-3 text-sm font-medium text-white/60 @md:text-base">
-                  Interactive 3D automotive experience.
+                  Interactive 3D configurator — real-time materials, lighting and
+                  paint systems built with React Three Fiber.
                 </p>
-
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Link
                     href="https://nextjs.org/"
-                    target="__blank"
+                    target="_blank"
                     className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70"
                   >
                     Next.js
                   </Link>
-
                   <Link
                     href="https://threejs.org/"
-                    target="__blank"
+                    target="_blank"
                     className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70"
                   >
                     Three.js
                   </Link>
-
                   <Link
                     href="https://motion.dev/"
-                    target="__blank"
+                    target="_blank"
                     className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-white/70"
                   >
-                    Framer motion
+                    Framer Motion
                   </Link>
                 </div>
-
                 <div className="mt-6">
                   <div className="mb-2 text-xs font-bold uppercase tracking-widest text-white/40">
                     Explore
                   </div>
-
                   <p className="text-xs leading-relaxed text-white/50">
-                    Rotate the vehicle and switch between different paint
-                    configurations.
+                    Rotate the vehicle and switch between paint configurations.
                   </p>
                 </div>
               </div>
@@ -531,7 +599,6 @@ export default function Projects({
                 >
                   <Light />
                   <ambientLight intensity={0.3} />
-
                   <mesh
                     rotation={[-Math.PI / 2, 0, 0]}
                     position={[0.1, -0.1, 0]}
@@ -543,7 +610,6 @@ export default function Projects({
                       metalness={0.2}
                     />
                   </mesh>
-
                   <BmwModel
                     scale={0.1}
                     position={[0.4, -0.1, 0]}
@@ -563,7 +629,6 @@ export default function Projects({
                     blackMetallicColor={carConfig.blackMetallicColor}
                     tireColor={carConfig.tireColor}
                   />
-
                   <ContactShadows
                     position={[0.1, -0.08, 0]}
                     opacity={0.65}
@@ -571,7 +636,6 @@ export default function Projects({
                     blur={2}
                     far={4}
                   />
-
                   <OrbitControls
                     enableZoom={false}
                     enablePan={false}
@@ -583,13 +647,8 @@ export default function Projects({
               <motion.div
                 data-car-controls
                 className="relative z-30 shrink-0 overflow-hidden border-t border-white/10 bg-black/90 text-white shadow-[0_-20px_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
-                animate={{
-                  height: panelOpen ? 250 : 88,
-                }}
-                transition={{
-                  duration: 0.45,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
+                animate={{ height: panelOpen ? 250 : 88 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="flex h-22 items-center justify-between gap-4 px-5 @md:px-8">
                   <div className="flex min-w-0 items-center gap-4">
@@ -597,30 +656,19 @@ export default function Projects({
                       type="button"
                       onClick={() => setPanelOpen((prev) => !prev)}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10 active:scale-95"
-                      aria-label={
-                        panelOpen
-                          ? "Collapse customization panel"
-                          : "Expand customization panel"
-                      }
                     >
                       <motion.span
-                        animate={{
-                          rotate: panelOpen ? 180 : 0,
-                        }}
-                        transition={{
-                          duration: 0.3,
-                        }}
+                        animate={{ rotate: panelOpen ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
                         className="text-lg"
                       >
                         ↑
                       </motion.span>
                     </button>
-
                     <div className="min-w-0">
                       <div className="text-xl font-black @md:text-2xl">
                         BMW M4
                       </div>
-
                       <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35 @md:text-xs">
                         {selectedPreset
                           ? `${selectedPreset} configuration`
@@ -628,20 +676,15 @@ export default function Projects({
                       </div>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3">
                     <div
                       className="h-9 w-9 rounded-full border border-white/20 shadow-lg"
-                      style={{
-                        backgroundColor: color,
-                      }}
+                      style={{ backgroundColor: color }}
                     />
-
                     <div className="hidden text-right @md:block">
                       <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">
                         Paint
                       </div>
-
                       <div className="text-sm font-semibold text-white/70">
                         {color}
                       </div>
@@ -650,31 +693,23 @@ export default function Projects({
                 </div>
 
                 <motion.div
-                  className="h-40.5 overflow-y-auto px-5 pb-6 @md:px-8 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/15 hover:[&::-webkit-scrollbar-thumb]:bg-white/25"
+                  className="h-40.5 overflow-y-auto px-5 pb-6 @md:px-8 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/15"
                   initial={false}
                   animate={{
                     opacity: panelOpen ? 1 : 0,
                     y: panelOpen ? 0 : 15,
                   }}
-                  transition={{
-                    duration: 0.25,
-                  }}
-                  style={{
-                    pointerEvents: panelOpen ? "auto" : "none",
-                  }}
-                  onWheel={(event) => {
-                    event.stopPropagation();
-                  }}
+                  transition={{ duration: 0.25 }}
+                  style={{ pointerEvents: panelOpen ? "auto" : "none" }}
+                  onWheel={(event) => event.stopPropagation()}
                 >
                   <div>
                     <div className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
                       Signature builds
                     </div>
-
-                    <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10">
+                    <div className="flex gap-3 overflow-x-auto pb-2">
                       {PRESETS.map((preset) => {
                         const active = selectedPreset === preset.name;
-
                         return (
                           <button
                             key={preset.name}
@@ -683,7 +718,7 @@ export default function Projects({
                             className={`group relative flex min-w-31.25 shrink-0 items-center gap-3 rounded-2xl border p-3 text-left transition ${
                               active
                                 ? "border-white/40 bg-white/10"
-                                : "border-white/10 bg-white/3 hover:bg-white/[0.07]"
+                                : "border-white/10 bg-white/3 hover:bg-white/7"
                             }`}
                           >
                             <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl">
@@ -695,7 +730,6 @@ export default function Projects({
                               />
                               <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
                             </div>
-
                             <div className="min-w-0">
                               <div className="truncate text-xs font-black">
                                 {preset.name}
@@ -714,13 +748,11 @@ export default function Projects({
                     <div className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
                       Paint colors
                     </div>
-
                     <div className="flex flex-wrap gap-3">
                       {NORMAL_COLORS.map((paint) => {
                         const active =
                           selectedPreset === "" &&
                           color.toLowerCase() === paint.value.toLowerCase();
-
                         return (
                           <button
                             key={paint.name}
@@ -734,9 +766,7 @@ export default function Projects({
                           >
                             <span
                               className="h-5 w-5 rounded-full border border-white/15"
-                              style={{
-                                backgroundColor: paint.value,
-                              }}
+                              style={{ backgroundColor: paint.value }}
                             />
                             <span className="text-xs font-bold text-white/70">
                               {paint.name}
@@ -751,7 +781,6 @@ export default function Projects({
                     <div className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
                       Body
                     </div>
-
                     <div className="flex flex-wrap gap-3">
                       {[
                         { name: "Body", key: "baseColor" as const },
@@ -759,7 +788,6 @@ export default function Projects({
                       ].map((item) => {
                         const value =
                           carColors[item.key] || activePreset[item.key];
-
                         return (
                           <div
                             key={item.key}
@@ -786,7 +814,6 @@ export default function Projects({
                     <div className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
                       Glass & lights
                     </div>
-
                     <div className="flex flex-wrap gap-3">
                       {[
                         { name: "Windshield", key: "windshieldColor" as const },
@@ -797,7 +824,6 @@ export default function Projects({
                       ].map((item) => {
                         const value =
                           carColors[item.key] || activePreset[item.key];
-
                         return (
                           <div
                             key={item.key}
@@ -824,7 +850,6 @@ export default function Projects({
                     <div className="mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/30">
                       Wheels
                     </div>
-
                     <div className="flex flex-wrap gap-3">
                       {[
                         { name: "Rim", key: "rimComponentColor" as const },
@@ -838,7 +863,6 @@ export default function Projects({
                       ].map((item) => {
                         const value =
                           carColors[item.key] || activePreset[item.key];
-
                         return (
                           <div
                             key={item.key}
@@ -867,18 +891,13 @@ export default function Projects({
 
           <motion.section
             className="absolute inset-0 flex h-full w-full flex-col overflow-hidden bg-black"
-            initial={{
-              opacity: 0,
-            }}
+            initial={false}
             animate={{
-              opacity: showThird ? 1 : 0,
-              zIndex: showThird ? 30 : 0,
-              pointerEvents: showThird ? "auto" : "none",
+              opacity: page3Visible ? 1 : 0,
+              zIndex: page3Visible ? 30 : 0,
+              pointerEvents: page3Visible ? "auto" : "none",
             }}
-            transition={{
-              duration: 0.8,
-              ease: "easeInOut",
-            }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
           >
             <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
               <video
@@ -889,62 +908,197 @@ export default function Projects({
                 loop
                 className="absolute inset-0 h-full w-full scale-[1.5] object-cover"
               />
+              <div className="absolute inset-0 bg-black/55" />
+              <Cutout showThird={page3Visible}>I L I A</Cutout>
+              <motion.div
+                className="relative z-30 flex h-full flex-col items-center justify-end gap-3 px-6 pb-16 text-center"
+                initial={false}
+                animate={{
+                  opacity: page3Visible ? 1 : 0,
+                  y: page3Visible ? 0 : 20,
+                }}
+                transition={{ delay: page3Visible ? 2.2 : 0, duration: 0.8, ease: "easeOut" }}
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-white/45">
+                  Selected work
+                </p>
+                <h2 className="text-3xl font-black tracking-tight text-white drop-shadow-lg @md:text-5xl">
+                  Performance obsessed
+                </h2>
+                <p className="max-w-md text-sm font-medium leading-relaxed text-white/65 @md:text-base">
+                  Shipping fast, polished products with Next.js, TypeScript and
+                  MongoDB. From e-commerce platforms to interactive 3D
+                  experiences — every millisecond matters.
+                </p>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                  {[
+                    "Next.js",
+                    "TypeScript",
+                    "MongoDB",
+                    "PostgreSQL",
+                    "Three.js",
+                    "Node.js",
+                  ].map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-full border border-white/20 bg-black/40 px-4 py-1.5 text-xs font-bold text-white/80 backdrop-blur-sm"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-4 flex gap-3">
+                  <a
+                    href="https://github.com/iliawm"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-white/25 bg-white/10 px-5 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    GitHub
+                  </a>
+                  <a
+                    href="https://www.iliawm.ir"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="rounded-full border border-white/25 bg-white/10 px-5 py-2 text-xs font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    iliawm.ir
+                  </a>
+                </div>
+                <p className="mt-2 text-[10px] uppercase tracking-[0.3em] text-white/35">
+                  Scroll for projects
+                </p>
+              </motion.div>
+            </div>
+          </motion.section>
 
-              <Cutout showThird={showThird}>I L I A</Cutout>
+          <motion.section
+            className="absolute inset-0 flex h-full w-full flex-col overflow-hidden bg-black"
+            initial={false}
+            animate={{
+              opacity: page4Visible ? 1 : 0,
+              zIndex: page4Visible ? 40 : 0,
+              pointerEvents: page4Visible ? "auto" : "none",
+            }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
+          >
+            <div className="absolute inset-0 bg-[#070707]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.07),transparent_50%)]" />
 
-             <motion.div
-              className="relative z-30 flex h-full flex-col items-center justify-end gap-3 px-6 pb-16 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: showThird ? 1 : 0,
-                y: showThird ? 0 : 20,
-              }}
-              transition={{ delay: 2.2, duration: 0.8, ease: "easeOut" }}
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-white/40">
-                Selected work
-              </p>
+            <div className="relative z-10 flex h-full min-h-0 gap-4 p-4 @md:gap-5 @md:p-6">
+              <motion.div
+                initial={false}
+                animate={{
+                  opacity: page4Visible ? 1 : 0,
+                  x: page4Visible ? 0 : -20,
+                }}
+                transition={{ delay: page4Visible ? 0.15 : 0, duration: 0.5 }}
+                className="flex w-[38%] min-w-0 flex-col rounded-3xl border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-2xl @md:w-[34%] @md:p-6"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">
+                  Archive
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight text-white @md:text-3xl">
+                  Other builds
+                </h2>
 
-              <h2 className="text-3xl font-black tracking-tight text-white @md:text-5xl">
-                Performance obsessed
-              </h2>
+                <div className="mt-6 flex flex-1 flex-col justify-center gap-1">
+                  {PROJECTS.map((project, i) => {
+                    const active = expandedId === project.id;
+                    return (
+                      <button
+                        key={project.id}
+                        type="button"
+                        onClick={() => setExpandedId(project.id)}
+                        className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
+                          active
+                            ? "bg-white/10 text-white"
+                            : "text-white/40 hover:bg-white/5 hover:text-white/70"
+                        }`}
+                      >
+                        <span className="text-[10px] font-bold tracking-widest opacity-50">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="truncate text-sm font-bold @md:text-base">
+                          {project.title}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
 
-              <p className="max-w-md text-sm font-medium leading-relaxed text-white/50 @md:text-base">
-                Shipping fast, polished products with Next.js, TypeScript and MongoDB.
-                From e-commerce platforms to interactive 3D experiences — every
-                millisecond matters.
-              </p>
+                <a
+                  href="https://github.com/iliawm"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 transition hover:text-white/60"
+                >
+                  All repos →
+                </a>
+              </motion.div>
 
-              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Next.js
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  TypeScript
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  MongoDB
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  PostgreSQL/Prisma
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Threejs
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Better Auth
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Use REST APIs
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Tailwind CSS
-                </span>
-                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
-                  Node.js
-                </span>
-              </div>
-            </motion.div>
+              <motion.div
+                initial={false}
+                animate={{
+                  opacity: page4Visible ? 1 : 0,
+                  x: page4Visible ? 0 : 20,
+                }}
+                transition={{ delay: page4Visible ? 0.25 : 0, duration: 0.5 }}
+                className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-2xl"
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeProject.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35 }}
+                    className="flex h-full min-h-0 flex-col"
+                  >
+                    <div className="relative aspect-video w-full shrink-0 overflow-hidden border-b border-white/10 bg-black/40">
+                      <Image
+                        src={activeProject.image}
+                        alt={activeProject.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 66vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <span className="absolute bottom-3 left-4 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80 backdrop-blur-md">
+                        {activeProject.tag}
+                      </span>
+                    </div>
+
+                    <div className="flex min-h-0 flex-1 flex-col p-5 @md:p-6">
+                      <h3 className="text-xl font-black tracking-tight text-white @md:text-3xl">
+                        {activeProject.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/55">
+                        {activeProject.summary}
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {activeProject.stack.map((s) => (
+                          <span
+                            key={s}
+                            className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[10px] font-bold text-white/70"
+                          >
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                      <a
+                        href={activeProject.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-auto inline-flex w-fit items-center gap-2 pt-5 text-xs font-bold uppercase tracking-[0.2em] text-white transition hover:text-white/60"
+                      >
+                        Open on GitHub
+                        <span className="h-px w-6 bg-white/40" />
+                      </a>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </motion.div>
             </div>
           </motion.section>
         </div>
