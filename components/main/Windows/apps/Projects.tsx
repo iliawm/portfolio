@@ -26,18 +26,15 @@ import Link from "next/link";
 type CarPreset = {
   name: string;
   color: string;
-
   baseColor: string;
   colouredPartsColor: string;
   carbonColor: string;
   darkColor: string;
-
   windshieldColor: string;
   glassColor: string;
   redGlassColor: string;
   emitColor: string;
   wmitRedColor: string;
-
   rimComponentColor: string;
   brakeDiscColor: string;
   rimColor: string;
@@ -171,9 +168,15 @@ type CarColors = {
   tireColor: string;
 };
 
-function BMWCutout() {
+function Cutout({
+  showThird,
+  children,
+}: {
+  showThird: boolean;
+  children?: React.ReactNode;
+}) {
   return (
-    <svg
+    <motion.svg
       className="pointer-events-none absolute inset-0 z-20 h-full w-full"
       viewBox="0 0 1600 900"
       preserveAspectRatio="none"
@@ -181,46 +184,47 @@ function BMWCutout() {
     >
       <defs>
         <mask
-          id="bmw-cutout-mask"
+          id="cutout-mask"
           maskUnits="userSpaceOnUse"
           x="0"
           y="0"
           width="1600"
           height="900"
         >
-          <rect
-            x="0"
-            y="0"
-            width="1600"
-            height="900"
-            fill="white"
-          />
-
-          <text
+          <rect x="0" y="0" width="1600" height="900" fill="white" />
+          <motion.text
             x="800"
             y="450"
             textAnchor="middle"
             dominantBaseline="middle"
             fill="black"
-            fontFamily="Arial Black, Arial, Helvetica, sans-serif"
             fontSize="230"
             fontWeight="900"
             letterSpacing="-12"
+            initial={{ scale: 1.5 }}
+            animate={{
+              y: showThird ? 10 : 1,
+              scale: showThird ? 330 : 1,
+            }}
+            transition={{
+              delay: 1,
+              duration: 1,
+              ease: "easeInOut",
+            }}
           >
-            BMW M4
-          </text>
+            {children}
+          </motion.text>
         </mask>
       </defs>
-
       <rect
         x="0"
         y="0"
         width="1600"
         height="900"
         fill="black"
-        mask="url(#bmw-cutout-mask)"
+        mask="url(#cutout-mask)"
       />
-    </svg>
+    </motion.svg>
   );
 }
 
@@ -254,9 +258,7 @@ export default function Projects({
   const [showNext, setShowNext] = useState(false);
   const [showThird, setShowThird] = useState(false);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [color, setColor] = useState("#000000");
   const [selectedPreset, setSelectedPreset] = useState("Shadow");
@@ -289,10 +291,7 @@ export default function Projects({
 
       const current = scroll.get();
 
-      const next =
-        event.deltaY > 0
-          ? current + 120
-          : current - 120;
+      const next = event.deltaY > 0 ? current + 120 : current - 120;
 
       let boundedNext;
 
@@ -322,66 +321,26 @@ export default function Projects({
   }, [scroll]);
 
   const activePreset =
-    PRESETS.find(
-      (preset) => preset.name === selectedPreset
-    ) ?? PRESETS[0];
+    PRESETS.find((preset) => preset.name === selectedPreset) ?? PRESETS[0];
 
   const carConfig = {
-    baseColor:
-      carColors.baseColor ||
-      activePreset.baseColor,
-
+    baseColor: carColors.baseColor || activePreset.baseColor,
     colouredPartsColor:
-      carColors.colouredPartsColor ||
-      activePreset.colouredPartsColor,
-
-    carbonColor:
-      carColors.carbonColor ||
-      activePreset.carbonColor,
-
-    darkColor:
-      carColors.darkColor ||
-      activePreset.darkColor,
-
-    windshieldColor:
-      carColors.windshieldColor ||
-      activePreset.windshieldColor,
-
-    glassColor:
-      carColors.glassColor ||
-      activePreset.glassColor,
-
-    redGlassColor:
-      carColors.redGlassColor ||
-      activePreset.redGlassColor,
-
-    emitColor:
-      carColors.emitColor ||
-      activePreset.emitColor,
-
-    wmitRedColor:
-      carColors.wmitRedColor ||
-      activePreset.wmitRedColor,
-
+      carColors.colouredPartsColor || activePreset.colouredPartsColor,
+    carbonColor: carColors.carbonColor || activePreset.carbonColor,
+    darkColor: carColors.darkColor || activePreset.darkColor,
+    windshieldColor: carColors.windshieldColor || activePreset.windshieldColor,
+    glassColor: carColors.glassColor || activePreset.glassColor,
+    redGlassColor: carColors.redGlassColor || activePreset.redGlassColor,
+    emitColor: carColors.emitColor || activePreset.emitColor,
+    wmitRedColor: carColors.wmitRedColor || activePreset.wmitRedColor,
     rimComponentColor:
-      carColors.rimComponentColor ||
-      activePreset.rimComponentColor,
-
-    brakeDiscColor:
-      carColors.brakeDiscColor ||
-      activePreset.brakeDiscColor,
-
-    rimColor:
-      carColors.rimColor ||
-      activePreset.rimColor,
-
+      carColors.rimComponentColor || activePreset.rimComponentColor,
+    brakeDiscColor: carColors.brakeDiscColor || activePreset.brakeDiscColor,
+    rimColor: carColors.rimColor || activePreset.rimColor,
     blackMetallicColor:
-      carColors.blackMetallicColor ||
-      activePreset.blackMetallicColor,
-
-    tireColor:
-      carColors.tireColor ||
-      activePreset.tireColor,
+      carColors.blackMetallicColor || activePreset.blackMetallicColor,
+    tireColor: carColors.tireColor || activePreset.tireColor,
   };
 
   const selectPreset = (preset: CarPreset) => {
@@ -390,30 +349,19 @@ export default function Projects({
 
     setCarColors({
       baseColor: preset.baseColor,
-      colouredPartsColor:
-        preset.colouredPartsColor,
+      colouredPartsColor: preset.colouredPartsColor,
       carbonColor: preset.carbonColor,
       darkColor: preset.darkColor,
-      windshieldColor:
-        preset.windshieldColor,
-      glassColor:
-        preset.glassColor,
-      redGlassColor:
-        preset.redGlassColor,
-      emitColor:
-        preset.emitColor,
-      wmitRedColor:
-        preset.wmitRedColor,
-      rimComponentColor:
-        preset.rimComponentColor,
-      brakeDiscColor:
-        preset.brakeDiscColor,
-      rimColor:
-        preset.rimColor,
-      blackMetallicColor:
-        preset.blackMetallicColor,
-      tireColor:
-        preset.tireColor,
+      windshieldColor: preset.windshieldColor,
+      glassColor: preset.glassColor,
+      redGlassColor: preset.redGlassColor,
+      emitColor: preset.emitColor,
+      wmitRedColor: preset.wmitRedColor,
+      rimComponentColor: preset.rimComponentColor,
+      brakeDiscColor: preset.brakeDiscColor,
+      rimColor: preset.rimColor,
+      blackMetallicColor: preset.blackMetallicColor,
+      tireColor: preset.tireColor,
     });
   };
 
@@ -422,10 +370,7 @@ export default function Projects({
     setColor(value);
   };
 
-  const updateCarColor = (
-    key: keyof CarColors,
-    value: string
-  ) => {
+  const updateCarColor = (key: keyof CarColors, value: string) => {
     setSelectedPreset("");
 
     setCarColors((prev) => ({
@@ -500,24 +445,12 @@ export default function Projects({
               opacity: 0,
             }}
             animate={{
-              opacity:
-                showNext && !showThird
-                  ? 1
-                  : 0,
-              zIndex:
-                showNext && !showThird
-                  ? 20
-                  : 0,
-              pointerEvents:
-                showNext && !showThird
-                  ? "auto"
-                  : "none",
+              opacity: showNext && !showThird ? 1 : 0,
+              zIndex: showNext && !showThird ? 20 : 0,
+              pointerEvents: showNext && !showThird ? "auto" : "none",
             }}
             transition={{
-              delay:
-                showNext && !showThird
-                  ? 0.5
-                  : 0,
+              delay: showNext && !showThird ? 0.5 : 0,
               duration: 0.8,
               ease: "easeInOut",
             }}
@@ -530,7 +463,6 @@ export default function Projects({
                 className="object-cover opacity-20 grayscale"
                 priority
               />
-
               <div className="absolute inset-0 bg-black/70" />
             </div>
 
@@ -580,7 +512,8 @@ export default function Projects({
                   </div>
 
                   <p className="text-xs leading-relaxed text-white/50">
-                    Rotate the vehicle and switch between different paint configurations.
+                    Rotate the vehicle and switch between different paint
+                    configurations.
                   </p>
                 </div>
               </div>
@@ -589,11 +522,7 @@ export default function Projects({
                 <Canvas
                   id="canvas"
                   camera={{
-                    position: [
-                      1.8,
-                      0.5,
-                      2,
-                    ],
+                    position: [1.8, 0.5, 2],
                     fov: 30,
                     near: 1,
                     far: 50,
@@ -601,28 +530,13 @@ export default function Projects({
                   className="h-full w-full"
                 >
                   <Light />
-
                   <ambientLight intensity={0.3} />
 
                   <mesh
-                    rotation={[
-                      -Math.PI / 2,
-                      0,
-                      0,
-                    ]}
-                    position={[
-                      0.1,
-                      -0.1,
-                      0,
-                    ]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                    position={[0.1, -0.1, 0]}
                   >
-                    <circleGeometry
-                      args={[
-                        4,
-                        96,
-                      ]}
-                    />
-
+                    <circleGeometry args={[4, 96]} />
                     <meshStandardMaterial
                       color="#111111"
                       roughness={0.65}
@@ -632,62 +546,26 @@ export default function Projects({
 
                   <BmwModel
                     scale={0.1}
-                    position={[
-                      0.4,
-                      -0.1,
-                      0,
-                    ]}
+                    position={[0.4, -0.1, 0]}
                     color={color}
-                    baseColor={
-                      carConfig.baseColor
-                    }
-                    colouredPartsColor={
-                      carConfig.colouredPartsColor
-                    }
-                    carbonColor={
-                      carConfig.carbonColor
-                    }
-                    darkColor={
-                      carConfig.darkColor
-                    }
-                    windshieldColor={
-                      carConfig.windshieldColor
-                    }
-                    glassColor={
-                      carConfig.glassColor
-                    }
-                    redGlassColor={
-                      carConfig.redGlassColor
-                    }
-                    emitColor={
-                      carConfig.emitColor
-                    }
-                    wmitRedColor={
-                      carConfig.wmitRedColor
-                    }
-                    rimComponentColor={
-                      carConfig.rimComponentColor
-                    }
-                    brakeDiscColor={
-                      carConfig.brakeDiscColor
-                    }
-                    rimColor={
-                      carConfig.rimColor
-                    }
-                    blackMetallicColor={
-                      carConfig.blackMetallicColor
-                    }
-                    tireColor={
-                      carConfig.tireColor
-                    }
+                    baseColor={carConfig.baseColor}
+                    colouredPartsColor={carConfig.colouredPartsColor}
+                    carbonColor={carConfig.carbonColor}
+                    darkColor={carConfig.darkColor}
+                    windshieldColor={carConfig.windshieldColor}
+                    glassColor={carConfig.glassColor}
+                    redGlassColor={carConfig.redGlassColor}
+                    emitColor={carConfig.emitColor}
+                    wmitRedColor={carConfig.wmitRedColor}
+                    rimComponentColor={carConfig.rimComponentColor}
+                    brakeDiscColor={carConfig.brakeDiscColor}
+                    rimColor={carConfig.rimColor}
+                    blackMetallicColor={carConfig.blackMetallicColor}
+                    tireColor={carConfig.tireColor}
                   />
 
                   <ContactShadows
-                    position={[
-                      0.1,
-                      -0.08,
-                      0,
-                    ]}
+                    position={[0.1, -0.08, 0]}
                     opacity={0.65}
                     scale={6}
                     blur={2}
@@ -706,30 +584,18 @@ export default function Projects({
                 data-car-controls
                 className="relative z-30 shrink-0 overflow-hidden border-t border-white/10 bg-black/90 text-white shadow-[0_-20px_60px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
                 animate={{
-                  height:
-                    panelOpen
-                      ? 250
-                      : 88,
+                  height: panelOpen ? 250 : 88,
                 }}
                 transition={{
                   duration: 0.45,
-                  ease: [
-                    0.22,
-                    1,
-                    0.36,
-                    1,
-                  ],
+                  ease: [0.22, 1, 0.36, 1],
                 }}
               >
                 <div className="flex h-22 items-center justify-between gap-4 px-5 @md:px-8">
                   <div className="flex min-w-0 items-center gap-4">
                     <button
                       type="button"
-                      onClick={() =>
-                        setPanelOpen(
-                          (prev) => !prev
-                        )
-                      }
+                      onClick={() => setPanelOpen((prev) => !prev)}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10 active:scale-95"
                       aria-label={
                         panelOpen
@@ -739,10 +605,7 @@ export default function Projects({
                     >
                       <motion.span
                         animate={{
-                          rotate:
-                            panelOpen
-                              ? 180
-                              : 0,
+                          rotate: panelOpen ? 180 : 0,
                         }}
                         transition={{
                           duration: 0.3,
@@ -770,8 +633,7 @@ export default function Projects({
                     <div
                       className="h-9 w-9 rounded-full border border-white/20 shadow-lg"
                       style={{
-                        backgroundColor:
-                          color,
+                        backgroundColor: color,
                       }}
                     />
 
@@ -791,23 +653,14 @@ export default function Projects({
                   className="h-40.5 overflow-y-auto px-5 pb-6 @md:px-8 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/15 hover:[&::-webkit-scrollbar-thumb]:bg-white/25"
                   initial={false}
                   animate={{
-                    opacity:
-                      panelOpen
-                        ? 1
-                        : 0,
-                    y:
-                      panelOpen
-                        ? 0
-                        : 15,
+                    opacity: panelOpen ? 1 : 0,
+                    y: panelOpen ? 0 : 15,
                   }}
                   transition={{
                     duration: 0.25,
                   }}
                   style={{
-                    pointerEvents:
-                      panelOpen
-                        ? "auto"
-                        : "none",
+                    pointerEvents: panelOpen ? "auto" : "none",
                   }}
                   onWheel={(event) => {
                     event.stopPropagation();
@@ -819,53 +672,41 @@ export default function Projects({
                     </div>
 
                     <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/10">
-                      {PRESETS.map(
-                        (preset) => {
-                          const active =
-                            selectedPreset ===
-                            preset.name;
+                      {PRESETS.map((preset) => {
+                        const active = selectedPreset === preset.name;
 
-                          return (
-                            <button
-                              key={
-                                preset.name
-                              }
-                              type="button"
-                              onClick={() =>
-                                selectPreset(
-                                  preset
-                                )
-                              }
-                              className={`group relative flex min-w-31.25 shrink-0 items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                                active
-                                  ? "border-white/40 bg-white/10"
-                                  : "border-white/10 bg-white/3 hover:bg-white/[0.07]"
-                              }`}
-                            >
-                              <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl">
-                                <div
-                                  className="absolute inset-0"
-                                  style={{
-                                    background: `radial-gradient(circle at 35% 35%, ${preset.color} 0%, ${preset.color} 45%, #050505 100%)`,
-                                  }}
-                                />
+                        return (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => selectPreset(preset)}
+                            className={`group relative flex min-w-31.25 shrink-0 items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                              active
+                                ? "border-white/40 bg-white/10"
+                                : "border-white/10 bg-white/3 hover:bg-white/[0.07]"
+                            }`}
+                          >
+                            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl">
+                              <div
+                                className="absolute inset-0"
+                                style={{
+                                  background: `radial-gradient(circle at 35% 35%, ${preset.color} 0%, ${preset.color} 45%, #050505 100%)`,
+                                }}
+                              />
+                              <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
+                            </div>
 
-                                <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
+                            <div className="min-w-0">
+                              <div className="truncate text-xs font-black">
+                                {preset.name}
                               </div>
-
-                              <div className="min-w-0">
-                                <div className="truncate text-xs font-black">
-                                  {preset.name}
-                                </div>
-
-                                <div className="mt-1 truncate text-[10px] text-white/40">
-                                  Full setup
-                                </div>
+                              <div className="mt-1 truncate text-[10px] text-white/40">
+                                Full setup
                               </div>
-                            </button>
-                          );
-                        }
-                      )}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -875,46 +716,34 @@ export default function Projects({
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                      {NORMAL_COLORS.map(
-                        (paint) => {
-                          const active =
-                            selectedPreset ===
-                              "" &&
-                            color.toLowerCase() ===
-                              paint.value.toLowerCase();
+                      {NORMAL_COLORS.map((paint) => {
+                        const active =
+                          selectedPreset === "" &&
+                          color.toLowerCase() === paint.value.toLowerCase();
 
-                          return (
-                            <button
-                              key={
-                                paint.name
-                              }
-                              type="button"
-                              onClick={() =>
-                                selectNormalColor(
-                                  paint.value
-                                )
-                              }
-                              className={`group flex items-center gap-2 rounded-full border px-3 py-2 transition ${
-                                active
-                                  ? "border-white/40 bg-white/10"
-                                  : "border-white/10 bg-white/3 hover:bg-white/8"
-                              }`}
-                            >
-                              <span
-                                className="h-5 w-5 rounded-full border border-white/15"
-                                style={{
-                                  backgroundColor:
-                                    paint.value,
-                                }}
-                              />
-
-                              <span className="text-xs font-bold text-white/70">
-                                {paint.name}
-                              </span>
-                            </button>
-                          );
-                        }
-                      )}
+                        return (
+                          <button
+                            key={paint.name}
+                            type="button"
+                            onClick={() => selectNormalColor(paint.value)}
+                            className={`group flex items-center gap-2 rounded-full border px-3 py-2 transition ${
+                              active
+                                ? "border-white/40 bg-white/10"
+                                : "border-white/10 bg-white/3 hover:bg-white/8"
+                            }`}
+                          >
+                            <span
+                              className="h-5 w-5 rounded-full border border-white/15"
+                              style={{
+                                backgroundColor: paint.value,
+                              }}
+                            />
+                            <span className="text-xs font-bold text-white/70">
+                              {paint.name}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -925,58 +754,31 @@ export default function Projects({
 
                     <div className="flex flex-wrap gap-3">
                       {[
-                        {
-                          name: "Body",
-                          key:
-                            "baseColor" as const,
-                        },
-                        {
-                          name: "Trim",
-                          key:
-                            "colouredPartsColor" as const,
-                        },
-                      ].map(
-                        (item) => {
-                          const value =
-                            carColors[
-                              item.key
-                            ] ||
-                            activePreset[
-                              item.key
-                            ];
+                        { name: "Body", key: "baseColor" as const },
+                        { name: "Trim", key: "colouredPartsColor" as const },
+                      ].map((item) => {
+                        const value =
+                          carColors[item.key] || activePreset[item.key];
 
-                          return (
-                            <div
-                              key={
-                                item.key
+                        return (
+                          <div
+                            key={item.key}
+                            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
+                          >
+                            <span className="text-xs font-bold text-white/60">
+                              {item.name}
+                            </span>
+                            <input
+                              type="color"
+                              value={value}
+                              onChange={(event) =>
+                                updateCarColor(item.key, event.target.value)
                               }
-                              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
-                            >
-                              <span className="text-xs font-bold text-white/60">
-                                {item.name}
-                              </span>
-
-                              <input
-                                type="color"
-                                value={
-                                  value
-                                }
-                                onChange={(
-                                  event
-                                ) =>
-                                  updateCarColor(
-                                    item.key,
-                                    event
-                                      .target
-                                      .value
-                                  )
-                                }
-                                className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
-                              />
-                            </div>
-                          );
-                        }
-                      )}
+                              className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -987,60 +789,34 @@ export default function Projects({
 
                     <div className="flex flex-wrap gap-3">
                       {[
+                        { name: "Windshield", key: "windshieldColor" as const },
                         {
-                          name:
-                            "Windshield",
-                          key:
-                            "windshieldColor" as const,
+                          name: "back brake light",
+                          key: "redGlassColor" as const,
                         },
-                        {
-                          name:
-                            "back brake light",
-                          key:
-                            "redGlassColor" as const,
-                        },
-                      ].map(
-                        (item) => {
-                          const value =
-                            carColors[
-                              item.key
-                            ] ||
-                            activePreset[
-                              item.key
-                            ];
+                      ].map((item) => {
+                        const value =
+                          carColors[item.key] || activePreset[item.key];
 
-                          return (
-                            <div
-                              key={
-                                item.key
+                        return (
+                          <div
+                            key={item.key}
+                            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
+                          >
+                            <span className="text-xs font-bold text-white/60">
+                              {item.name}
+                            </span>
+                            <input
+                              type="color"
+                              value={value}
+                              onChange={(event) =>
+                                updateCarColor(item.key, event.target.value)
                               }
-                              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
-                            >
-                              <span className="text-xs font-bold text-white/60">
-                                {item.name}
-                              </span>
-
-                              <input
-                                type="color"
-                                value={
-                                  value
-                                }
-                                onChange={(
-                                  event
-                                ) =>
-                                  updateCarColor(
-                                    item.key,
-                                    event
-                                      .target
-                                      .value
-                                  )
-                                }
-                                className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
-                              />
-                            </div>
-                          );
-                        }
-                      )}
+                              className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -1051,73 +827,37 @@ export default function Projects({
 
                     <div className="flex flex-wrap gap-3">
                       {[
-                        {
-                          name: "Rim",
-                          key:
-                            "rimComponentColor" as const,
-                        },
-                        {
-                          name: "Brake",
-                          key:
-                            "brakeDiscColor" as const,
-                        },
-                        {
-                          name: "Ring",
-                          key:
-                            "rimColor" as const,
-                        },
+                        { name: "Rim", key: "rimComponentColor" as const },
+                        { name: "Brake", key: "brakeDiscColor" as const },
+                        { name: "Ring", key: "rimColor" as const },
                         {
                           name: "tire screw",
-                          key:
-                            "blackMetallicColor" as const,
+                          key: "blackMetallicColor" as const,
                         },
-                        {
-                          name: "Tire",
-                          key:
-                            "tireColor" as const,
-                        },
-                      ].map(
-                        (item) => {
-                          const value =
-                            carColors[
-                              item.key
-                            ] ||
-                            activePreset[
-                              item.key
-                            ];
+                        { name: "Tire", key: "tireColor" as const },
+                      ].map((item) => {
+                        const value =
+                          carColors[item.key] || activePreset[item.key];
 
-                          return (
-                            <div
-                              key={
-                                item.key
+                        return (
+                          <div
+                            key={item.key}
+                            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
+                          >
+                            <span className="text-xs font-bold text-white/60">
+                              {item.name}
+                            </span>
+                            <input
+                              type="color"
+                              value={value}
+                              onChange={(event) =>
+                                updateCarColor(item.key, event.target.value)
                               }
-                              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/3 px-3 py-2"
-                            >
-                              <span className="text-xs font-bold text-white/60">
-                                {item.name}
-                              </span>
-
-                              <input
-                                type="color"
-                                value={
-                                  value
-                                }
-                                onChange={(
-                                  event
-                                ) =>
-                                  updateCarColor(
-                                    item.key,
-                                    event
-                                      .target
-                                      .value
-                                  )
-                                }
-                                className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
-                              />
-                            </div>
-                          );
-                        }
-                      )}
+                              className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 bg-transparent p-0"
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </motion.div>
@@ -1133,44 +873,78 @@ export default function Projects({
             animate={{
               opacity: showThird ? 1 : 0,
               zIndex: showThird ? 30 : 0,
-              pointerEvents: showThird
-                ? "auto"
-                : "none",
+              pointerEvents: showThird ? "auto" : "none",
             }}
             transition={{
               duration: 0.8,
               ease: "easeInOut",
             }}
           >
-            <div className="absolute inset-0">
-              <Image
-                src="/bg/bg.png"
-                alt="Background"
-                fill
-                className="object-cover opacity-20 grayscale"
+            <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+              <video
+                src="/video/bmw.mp4"
+                autoPlay
+                muted
+                playsInline
+                loop
+                className="absolute inset-0 h-full w-full scale-[1.5] object-cover"
               />
 
-              <div className="absolute inset-0 bg-black/70" />
-            </div>
+              <Cutout showThird={showThird}>I L I A</Cutout>
 
-            <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-              <BMWCutout />
+             <motion.div
+              className="relative z-30 flex h-full flex-col items-center justify-end gap-3 px-6 pb-16 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: showThird ? 1 : 0,
+                y: showThird ? 0 : 20,
+              }}
+              transition={{ delay: 2.2, duration: 0.8, ease: "easeOut" }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.45em] text-white/40">
+                Selected work
+              </p>
 
-              <div className="relative z-30 flex h-full items-center justify-center">
-                <div className="text-center">
-                  <div className="text-xs font-bold uppercase tracking-[0.5em] text-white/30">
-                    BMW
-                  </div>
+              <h2 className="text-3xl font-black tracking-tight text-white @md:text-5xl">
+                Performance obsessed
+              </h2>
 
-                  <h1 className="mt-3 text-4xl font-black text-white @md:text-6xl">
-                    M4 Competition
-                  </h1>
+              <p className="max-w-md text-sm font-medium leading-relaxed text-white/50 @md:text-base">
+                Shipping fast, polished products with Next.js, TypeScript and MongoDB.
+                From e-commerce platforms to interactive 3D experiences — every
+                millisecond matters.
+              </p>
 
-                  <p className="mt-3 text-sm font-medium text-white/40 @md:text-base">
-                    Performance engineered
-                  </p>
-                </div>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Next.js
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  TypeScript
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  MongoDB
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  PostgreSQL/Prisma
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Threejs
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Better Auth
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Use REST APIs
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Tailwind CSS
+                </span>
+                <span className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold text-white/70">
+                  Node.js
+                </span>
               </div>
+            </motion.div>
             </div>
           </motion.section>
         </div>
